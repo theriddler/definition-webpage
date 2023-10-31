@@ -24,9 +24,17 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
     }
   }
 
+  makeGuess(guess: Lowercase<string>[], similarity: number){
+    this.props.addGuessToState(guess, similarity)
+    
+    this.setState({
+      prevGuess: {value: guess, similarity: similarity}
+    })
+  }
+
   render(){
     return (
-      <form onSubmit={(event) => {event.preventDefault(); document.getElementById("submit")?.click();}} className="entry-form">
+      <form onSubmit={(event) => {document.getElementById("make_guess")?.click(); console.log(document.getElementById("make_guess")); event.preventDefault(); }} className="entry-form">
         <span>
           <input 
             id={`guess_input`} 
@@ -58,10 +66,9 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
             </button>
           </span>
           <input
-            id='submit'
+            id='make_guess'
             type='submit'
             className="mt-5"
-            onSubmit={function(){return false}}
             onClick={() => {
               
               // get our input object
@@ -72,10 +79,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
               
               // evaluate and set our guess to state
               evaluatePhrase(guess, this.props.currentDefinition)
-                .then((res) => {
-                  this.props.addGuessToState(guess, parseFloat(res.similarity))
-                  this.setState({prevGuess: {value: guess, similarity: parseFloat(res.similarity)}})
-                })
+                .then((res) => this.makeGuess(guess, parseFloat(res.similarity)))
                 .catch((err: Error) => console.log(err));
             }}
           />
@@ -93,7 +97,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
               
               if(guessThatIsNowHint)
                 evaluatePhrase(guessThatIsNowHint, this.props.currentDefinition)
-                  .then(res => this.props.addGuessToState(guessThatIsNowHint, parseFloat(res.similarity)))
+                  .then(res => this.makeGuess(guessThatIsNowHint, parseFloat(res.similarity)))
                   .catch(err => console.log(err))
                 
             }}
