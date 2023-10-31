@@ -43,7 +43,10 @@ class App extends React.Component<Props, State> {
   }
 
   componentDidMount(): void {
-    this.chooseWord(wordDictionary[Math.floor(Math.random()*wordDictionary.length)])
+    // choose a random word
+    this.chooseNewWord(wordDictionary[Math.floor(Math.random()*wordDictionary.length)])
+
+    // warm up lambda function
     evaluatePhrase(this.state.currentDefinition, this.state.currentDefinition).then(res => this.setState({spinner: false}))
   }
 
@@ -53,11 +56,11 @@ class App extends React.Component<Props, State> {
     }
   }
 
-  chooseWord(word: string): void {
+  chooseNewWord(word: string): void {
     fetch(wordDefinitionOptions(word).url, wordDefinitionOptions(word))
       .then(res => res.json())
       .then(data => this.setState({
-        currentWord: word, 
+        currentWord: cleanString(word), 
         originalDefinitionString: data[0]['meanings'][0]?.['definitions'][0]['definition'],
         currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition']
           .split(' ')
@@ -101,44 +104,13 @@ class App extends React.Component<Props, State> {
           </Col>
         </Row>
         <Row className='mt-5'>
-          <Col className=''>
+          <Col>
             <EntryForm
               guesses={this.state.guesses}
               currentDefinition={this.state.currentDefinition}
               originalDefinitionString={this.state.originalDefinitionString}
               addGuessToState={this.addGuessToState.bind(this)}
             />
-          </Col>
-        </Row>
-        <Row className='mt-3'>
-          <Col>
-            <div className='d-flex justify-content-center' style={{gap: '20px'}}>
-              <button
-                onClick={() => {
-                  let unfoundWords = this.state.currentDefinition
-                    .map((w: Lowercase<string>, idx: number) => ({w:w, idx:idx}))
-                    .filter((word: {w: Lowercase<string>, idx: number}) => !this.state.guesses.some(g => g.value.includes(word.w)))
-
-                  let randomWordIndex = Math.floor(Math.random() * unfoundWords.length)
-                  let randomWord = unfoundWords[randomWordIndex].w
-                  let guessToAddTo = this.state.guesses.find(g => g.value[randomWordIndex] !== randomWord)?.value || Array(this.state.currentDefinition.length).join('.').split('.')
-                  let guessThatIsNowHint = (guessToAddTo.splice(randomWordIndex, 0, randomWord) || '') as Lowercase<string>[]
-
-                  console.log(randomWordIndex)
-                  
-                  if(guessThatIsNowHint)
-                    evaluatePhrase(guessThatIsNowHint, this.state.currentDefinition)
-                      .then(res => this.addGuessToState(guessThatIsNowHint, parseFloat(res.similarity)))
-                      .catch(err => console.log(err))
-                    
-                }}
-              >
-                Hint
-              </button>
-              <button>
-                Clear
-              </button>
-            </div>
           </Col>
         </Row>
         <Row className='mt-5'>
@@ -156,7 +128,7 @@ class App extends React.Component<Props, State> {
                         <td>
                           {
                             guess.value
-                            .map((word: string, idx: number) => (
+                            .map((word: string, idx: number) => `${console.log(word)}` && (
                               <>
                                 <span 
                                   style={{backgroundColor: 
@@ -166,15 +138,7 @@ class App extends React.Component<Props, State> {
                                         ? 'orange'
                                         : 'red'
                                 }}>
-                                  {
-                                    this.state.currentDefinition[idx]
-                                      .split('')
-                                      .map((l,i) => {
-                                        letterCount++
-                                        return word?.split('')[i] || '-';
-                                      })
-                                      .join('')
-                                  }
+                                  {word}
                                 </span>
                                 {
                                   letterCount++ 
