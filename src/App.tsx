@@ -78,7 +78,7 @@ class App extends React.Component<Props, State> {
       <Container className='my-5 text-center'>
         <Row>
           <Col>
-            <h1>definition</h1>
+            <h3>definition</h3>
           </Col>
         </Row>
         <Row>
@@ -91,7 +91,7 @@ class App extends React.Component<Props, State> {
         <hr/>
         <Row className='mt-5'>
           <Col>
-            <h2 style={{color: 'purple'}}>{this.state.currentWord}</h2>
+            <h1 style={{color: 'purple'}}>{this.state.currentWord}</h1>
           </Col>
         </Row>
         <Row className='mt-5'>

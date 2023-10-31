@@ -29,32 +29,35 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
     let letterCount = -1; 
     return (
       <form onSubmit={(event) => {event.preventDefault()}} className="entry-form">
-        <div className="d-flex justify-content-center align-items-end flex-wrap">
+        <div className="d-flex justify-content-center align-items-end flex-wrap" style={{gap:'20px'}}>
           {
             this.props.currentDefinition
             .map((w: string, idx: number) => (letterCount += w.length) && (
               <>
-                <input 
-                  id={`${idx}_guess`} 
-                  type='text'
-                  className="m-2"
-                  placeholder={w.split('').map(l => ' - ').join('')}
-                  style={{
-                    width: `${w.length*40}px`,
-                    borderColor: 
-                      this.state.prevGuess?.value[idx] === w 
-                        ? 'green' 
-                        : this.props.currentDefinition.includes(this.state.prevGuess?.value[idx] || 'z')
-                          ? 'orange' 
-                          : !this.state.prevGuess?.value[idx]
-                            ? 'white' 
-                            : 'red'
-                  }}
-                />
-                {
-                  ['.',',',';'].includes(this.props.originalDefinitionString[++letterCount]) 
-                  && <span>{this.props.originalDefinitionString.split('')[letterCount++]}&nbsp;</span>
-                }
+                <span>
+                  <input 
+                    id={`${idx}_guess`} 
+                    type='text'
+                    className="ml-2 text-center"
+                    placeholder={w.split('').map(l => '-').join('')}
+                    maxLength={w.length}
+                    style={{
+                      width: `${w.length-0.2}em`,
+                      borderColor: 
+                        this.state.prevGuess?.value[idx] === w 
+                          ? 'green' 
+                          : this.props.currentDefinition.includes(this.state.prevGuess?.value[idx] || 'z')
+                            ? 'orange' 
+                            : !this.state.prevGuess?.value[idx]
+                              ? 'white' 
+                              : 'red'
+                    }}
+                  />
+                  {
+                    ['.',',',';'].includes(this.props.originalDefinitionString[++letterCount]) 
+                    && <span>&nbsp;{this.props.originalDefinitionString.split('')[letterCount++]}&nbsp;</span>
+                  }
+                </span> 
               </>
             ))
           }
