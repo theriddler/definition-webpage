@@ -62,6 +62,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
         <input
           id='click'
           type='submit'
+          className="mt-5"
           onClick={() => {
             
             // get each of the input objects for each word
