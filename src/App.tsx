@@ -53,7 +53,7 @@ class App extends React.Component<Props, State> {
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     if(prevState.currentDefinition !== this.state.currentDefinition){
-      console.log(this.state.currentDefinition)
+      console.log('updated')
     }
   }
 
@@ -66,7 +66,7 @@ class App extends React.Component<Props, State> {
         currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition']
           .split(' ')
           .map((w: string) => cleanString(w)),
-      }, () => console.log(this.state.currentDefinition)))
+      }))
   }
 
   addGuessToState(guess: string[], similarity: number) {

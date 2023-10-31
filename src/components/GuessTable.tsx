@@ -17,7 +17,7 @@ export const GuessTable = (props: GuessTableProps) => (
               <td>
                 {
                   guess.value
-                  .map((word: string, idx: number) => `${console.log(word)}` && (
+                  .map((word: string, idx: number) => (
                     <>
                       <span 
                         style={{backgroundColor: 

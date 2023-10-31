@@ -25,7 +25,10 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
   }
 
   makeGuess(guess: Lowercase<string>[], similarity: number){
-    this.props.addGuessToState(guess, similarity)
+    if(!this.props.guesses.some(g => guess.every((w: string, idx: number) => w && w === g.value[idx])))
+      this.props.addGuessToState(guess, similarity)
+    
+    
     
     this.setState({
       prevGuess: {value: guess, similarity: similarity}
@@ -34,7 +37,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
 
   render(){
     return (
-      <form onSubmit={(event) => {document.getElementById("make_guess")?.click(); console.log(document.getElementById("make_guess")); event.preventDefault(); }} className="entry-form">
+      <form onSubmit={(event) => {document.getElementById("guess_submit")?.click(); event.preventDefault(); }} className="entry-form">
         <span>
           <input 
             id={`guess_input`} 
@@ -58,32 +61,10 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
           } */}
         </span> 
         <div className='d-flex justify-content-center align-items-end' style={{gap: '50px'}}>
-          <span>
-            <button
-              style={{fontSize:'16px'}}
-            >
-              Reset
-            </button>
-          </span>
           <input
-            id='make_guess'
-            type='submit'
-            className="mt-5"
-            onClick={() => {
-              
-              // get our input object
-              let input = (document.getElementById(`guess_input`) as HTMLInputElement).value
-
-              // clean and split
-              let guess = cleanString(input).split(' ') as Lowercase<string>[]
-              
-              // evaluate and set our guess to state
-              evaluatePhrase(guess, this.props.currentDefinition)
-                .then((res) => this.makeGuess(guess, parseFloat(res.similarity)))
-                .catch((err: Error) => console.log(err));
-            }}
-          />
-          <button
+            id='guess_hint'
+            type='button'
+            value='Hint'
             style={{fontSize:'16px'}}
             onClick={() => {
               let unfoundWords = this.props.currentDefinition
@@ -91,19 +72,48 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
                 .filter((word: {w: string, idx: number}) => !this.props.guesses.some(g => g.value.includes(cleanString(word.w))))
 
               let randomWordIndex = Math.floor(Math.random() * unfoundWords.length)
-              let randomWord = unfoundWords[randomWordIndex]?.w
-              let guessToAddTo = this.props.guesses.find(g => g.value[randomWordIndex] !== randomWord)?.value || Array(this.props.currentDefinition.length).join('.').split('.')
-              let guessThatIsNowHint = (guessToAddTo.splice(randomWordIndex, 0, randomWord) || '') as Lowercase<string>[]
+              let randomWord = cleanString(unfoundWords[randomWordIndex]?.w)
               
-              if(guessThatIsNowHint)
+              let guessThatIsNowHint: Lowercase<string>[] = this.props.guesses
+                .find(g => g.value[randomWordIndex] !== randomWord)?.value || Array(this.props.currentDefinition.length)
+                .join('.')
+                .split('.')
+                .map((s:string) => cleanString(s))
+                
+              guessThatIsNowHint.splice(randomWordIndex, 0, randomWord)
+              console.log(guessThatIsNowHint)
+              
+              if(guessThatIsNowHint.length > 0)
                 evaluatePhrase(guessThatIsNowHint, this.props.currentDefinition)
                   .then(res => this.makeGuess(guessThatIsNowHint, parseFloat(res.similarity)))
                   .catch(err => console.log(err))
                 
             }}
-          >
-            Hint
-          </button>
+          />
+          <input
+            id='guess_submit'
+            type='submit'
+            className="mt-5"
+            onClick={() => {              
+              // get our input object
+              let input = (document.getElementById(`guess_input`) as HTMLInputElement).value
+
+              // clean, split and filter spaces out
+              let guess = cleanString(input).split(' ').filter(w => w) as Lowercase<string>[]
+              
+              // evaluate and set our guess to state
+              evaluatePhrase(guess, this.props.currentDefinition)
+                .then((res) => this.makeGuess(guess, parseFloat(res.similarity)))
+                .catch((err: Error) => console.log(err));
+            }}
+          />
+          <input
+            id='guess_reset'
+            type='button'
+            value='Reset'
+            style={{fontSize:'16px'}}
+            onClick={() => false}//(document.getElementById('guess_input') as HTMLInputElement)!.value = ''}}
+          />
         </div>
       </form>
     )
