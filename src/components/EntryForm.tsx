@@ -23,24 +23,18 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
     }
   }
 
-  componentDidUpdate(prevProps: Readonly<EntryFormProps>, prevState: Readonly<{}>, snapshot?: any): void {
-    if(prevProps.guesses.length !== this.props.guesses.length){
-      console.log(this.props.guesses)
-    }
-  }
-
   render(){
     return (
       <form onSubmit={(event) => {event.preventDefault()}}>
         {
           this.props.currentDefinition
-          .map((w: string, idx: number) => (
+          .map((w: string, idx: number) => `${console.log(this.state.prevGuess, w)}` && (
             <input 
               id={`${idx}_guess`} 
               type='text'
-              placeholder={w.split('').map(l => '-').join('')}
+              placeholder={w.split('').map(l => ' - ').join('')}
               style={{
-                width: `${w.length*18}px`,
+                width: `${w.length*24}px`,
                 borderColor: 
                   this.state.prevGuess?.value[idx] === w 
                     ? 'green' 
@@ -66,8 +60,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
               .map((w: string, idx: number) => (document.getElementById(`${idx}_guess`) as HTMLInputElement))
 
             // reassemble the user's input
-            let guess = inputs
-              .map(w => w.value)
+            let guess = inputs.map(w => w.value.toLowerCase()) as Lowercase<string>[]
             
             // evaluate and set our guess to state
             evaluatePhrase(guess, this.props.currentDefinition)

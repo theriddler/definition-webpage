@@ -46,7 +46,9 @@ class App extends React.Component<Props, State> {
       .then(res => res.json())
       .then(data => this.setState({
         currentWord: word, 
-        currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition'].split(' ').map((w: string) => w.replace(/;/gm, ''))
+        currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition']
+          .split(' ')
+          .map((w: string) => w.toLowerCase().replace(/;/gm, '') as Lowercase<string>)
       }, () => console.log(this.state.currentDefinition)))
   }
 
@@ -56,7 +58,7 @@ class App extends React.Component<Props, State> {
         guesses: [
           ...prevState.guesses, 
           {
-            'value': guess.map(w => w.toLowerCase()), 
+            'value': guess.map(w => w.toLowerCase() as Lowercase<string>), 
             'similarity': similarity
           }
         ]
@@ -102,20 +104,25 @@ class App extends React.Component<Props, State> {
                             <>
                               <span 
                                 style={{backgroundColor: 
-                                  this.state.currentDefinition.findIndex(w => w.toLowerCase() === word.toLowerCase()) === idx
+                                  this.state.currentDefinition.findIndex(w => w === word) === idx
                                     ? 'green'
-                                    : this.state.currentDefinition.some(w => `${console.log(w,word)}` && w.toLowerCase() === word.toLowerCase()) 
+                                    : this.state.currentDefinition.some(w => w === word) 
                                       ? 'orange'
                                       : 'red'
                               }}>
-                                {word}
+                                {
+                                  this.state.currentDefinition[idx]
+                                    .split('')
+                                    .map((l,i) => word.split('')[i] || '-')
+                                    .join('')
+                                }
                               </span>
                               &nbsp;
                             </>
                           ))
                         }
                       </td>
-                      <td>{guess.similarity}</td>
+                      <td>{guess.similarity}%</td>
                     </tr>
                   ))
                 }

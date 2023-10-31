@@ -8,8 +8,8 @@ export function evaluatePhrase(guess: string[], truth: string[]): Promise<{simil
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        phrase1: guess.join(' ').toLowerCase(),
-        phrase2: truth.join(' ').toLowerCase(),
+        phrase1: guess.join(' '),
+        phrase2: truth.join(' ')
       })
     })
     .then(res => res.json())
