@@ -1,4 +1,4 @@
 export interface Guess {
-  'value':string;
+  'value':string[];
   'similarity':number;
 }

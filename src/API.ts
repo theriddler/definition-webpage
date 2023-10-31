@@ -1,6 +1,6 @@
 
 
-export function evaluatePhrase(guess: string, truth: string): Promise<{similarity: string}> {
+export function evaluatePhrase(guess: string[], truth: string[]): Promise<{similarity: string}> {
   return new Promise((resolve, reject) => {
     fetch('https://tnuv44hsc0.execute-api.us-east-2.amazonaws.com/default/description_engine', {
       method: 'POST',
@@ -8,8 +8,8 @@ export function evaluatePhrase(guess: string, truth: string): Promise<{similarit
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        phrase1: guess.toLowerCase(),
-        phrase2: truth.toLowerCase(),
+        phrase1: guess.join(' ').toLowerCase(),
+        phrase2: truth.join(' ').toLowerCase(),
       })
     })
     .then(res => res.json())

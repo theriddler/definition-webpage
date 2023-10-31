@@ -12,7 +12,7 @@ interface Props {
 interface State {
   res: any;
   currentWord: string;
-  currentDefinition: string;
+  currentDefinition: string[];
   guesses: Guess[];
 }
 
@@ -30,7 +30,7 @@ class App extends React.Component<Props, State> {
     this.state = {
       res: null,
       guesses: [],
-      currentDefinition: '',
+      currentDefinition: [],
       currentWord: ''
     }
   }
@@ -44,17 +44,17 @@ class App extends React.Component<Props, State> {
       .then(res => res.json())
       .then(data => this.setState({
         currentWord: word, 
-        currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition']
+        currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition'].split(' ')
       }, () => console.log(this.state.currentDefinition)))
   }
 
-  setGuessToState(guess: string, similarity: number) {
+  setGuessToState(guess: string[], similarity: number) {
     this.setState((prevState) => { 
       return {
         guesses: [
           ...prevState.guesses, 
           {
-            'value': guess.toLowerCase(), 
+            'value': guess.map(w => w.toLowerCase()), 
             'similarity': similarity
           }
         ]
@@ -78,8 +78,9 @@ class App extends React.Component<Props, State> {
         <Row className='mt-3'>
           <Col className=''>
             <EntryForm
-              setGuessToState={this.setGuessToState.bind(this)}
+              guesses={this.state.guesses}
               currentDefinition={this.state.currentDefinition}
+              setGuessToState={this.setGuessToState.bind(this)}
             />
           </Col>
         </Row>
@@ -95,14 +96,13 @@ class App extends React.Component<Props, State> {
                       <td>
                         {
                           guess.value
-                          .split(' ')
-                          .map((word, idx) => (
+                          .map((word: string, idx: number) => (
                             <>
                               <span 
                                 style={{backgroundColor: 
-                                  !this.state.currentDefinition.split(' ').some(w => w.toLowerCase() === word.toLowerCase()) 
+                                  !this.state.currentDefinition.some(w => w.toLowerCase() === word.toLowerCase()) 
                                   ? 'red'
-                                  : this.state.currentDefinition.split(' ').findIndex(w => w.toLowerCase() === word.toLowerCase()) === idx
+                                  : this.state.currentDefinition.findIndex(w => w.toLowerCase() === word.toLowerCase()) === idx
                                     ? 'green'
                                     : 'yellow'
                               }}>
