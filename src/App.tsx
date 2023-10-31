@@ -6,6 +6,7 @@ import { EntryForm } from './components/EntryForm';
 import { Guess } from './types';
 import { evaluatePhrase } from './API';
 import { cleanString } from './utils';
+import wordDictionary from './wordDictionary.json' 
 
 interface Props {
 
@@ -42,7 +43,7 @@ class App extends React.Component<Props, State> {
   }
 
   componentDidMount(): void {
-    this.chooseWord('ambidextrous')
+    this.chooseWord(wordDictionary[Math.floor(Math.random()*wordDictionary.length)])
     evaluatePhrase(this.state.currentDefinition, this.state.currentDefinition).then(res => this.setState({spinner: false}))
   }
 
