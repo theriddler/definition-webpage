@@ -1,3 +1,4 @@
+import React from 'react'
 import { Guess } from "../types";
 
 interface GuessTableProps {
@@ -5,40 +6,44 @@ interface GuessTableProps {
   currentDefinition: Lowercase<string>[];
 }
 
-export const GuessTable = (props: GuessTableProps) => (
-  <table>
-    <tbody>
-      {
-        props.guesses
-        .sort((g1, g2) => g2.similarity - g1.similarity)
-        .map(guess => {
-          return (
-            <tr>
-              <td>
-                {
-                  guess.value
-                  .map((word: string, idx: number) => (
-                    <>
-                      <span 
-                        style={{backgroundColor: 
-                          props.currentDefinition[idx] === word
-                            ? 'green'
-                            : props.currentDefinition.some((w: Lowercase<string>) => w === word) 
-                              ? 'orange'
-                              : 'red'
-                      }}>
-                        {word}
-                      </span>
-                      &nbsp;
-                    </>
-                  ))
-                }
-              </td>
-              <td>{guess.similarity}%</td>
-            </tr>
-          )
-        })
-      }
-    </tbody>
-  </table>
-)
+export class GuessTable extends React.Component<GuessTableProps,{}>{
+  render() {
+    return (
+      <table>
+        <tbody>
+          {
+            this.props.guesses
+            .sort((g1, g2) => g2.similarity - g1.similarity)
+            .map(guess => {
+              return (
+                <tr>
+                  <td>
+                    {
+                      guess.value
+                      .map((word: string, idx: number) => (
+                        <>
+                          <span 
+                            style={{backgroundColor: 
+                              this.props.currentDefinition[idx] === word
+                                ? 'green'
+                                : this.props.currentDefinition.some((w: Lowercase<string>) => w === word) 
+                                  ? 'orange'
+                                  : 'red'
+                          }}>
+                            {word}
+                          </span>
+                          &nbsp;
+                        </>
+                      ))
+                    }
+                  </td>
+                  <td>{guess.similarity}%</td>
+                </tr>
+              )
+            })
+          }
+        </tbody>
+      </table>
+    )
+  }
+}

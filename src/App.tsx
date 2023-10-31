@@ -14,7 +14,6 @@ interface Props {
 }
 
 interface State {
-  res: any;
   currentWord: string;
   currentDefinition: Lowercase<string>[];
   originalDefinitionString: string;
@@ -34,7 +33,6 @@ class App extends React.Component<Props, State> {
     super(p);
 
     this.state = {
-      res: null,
       guesses: [],
       currentDefinition: [],
       originalDefinitionString: '',
@@ -52,6 +50,7 @@ class App extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    console.log(this.state.guesses)
     if(prevState.currentDefinition !== this.state.currentDefinition){
       console.log('updated')
     }
@@ -71,6 +70,7 @@ class App extends React.Component<Props, State> {
 
   addGuessToState(guess: string[], similarity: number) {
     this.setState((prevState) => { 
+      console.log('adding', prevState.guesses)
       return {
         guesses: [
           ...prevState.guesses, 
@@ -80,7 +80,7 @@ class App extends React.Component<Props, State> {
           }
         ]
       }
-    })
+    }, () => console.log('done', this.state.guesses))
   }
 
   render() {
@@ -94,7 +94,7 @@ class App extends React.Component<Props, State> {
         <Row>
           <Col>
             <p>
-              <strong>Define the word below in the space provided</strong>
+              Define the word below in the space provided
             </p>
           </Col>
         </Row>
