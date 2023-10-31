@@ -1,6 +1,7 @@
 import React from "react";
 import { evaluatePhrase } from "../API";
 import { Guess } from "../types";
+import { cleanString } from "../utils";
 
 
 interface EntryFormProps {
@@ -60,7 +61,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
               .map((w: string, idx: number) => (document.getElementById(`${idx}_guess`) as HTMLInputElement))
 
             // reassemble the user's input
-            let guess = inputs.map(w => w.value.toLowerCase()) as Lowercase<string>[]
+            let guess = inputs.map(w => cleanString(w.value))
             
             // evaluate and set our guess to state
             evaluatePhrase(guess, this.props.currentDefinition)

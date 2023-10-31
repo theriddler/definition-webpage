@@ -5,6 +5,7 @@ import { Col, Container, Row } from 'reactstrap'
 import { EntryForm } from './components/EntryForm';
 import { Guess } from './types';
 import { evaluatePhrase } from './API';
+import { cleanString } from './utils';
 
 interface Props {
 
@@ -48,7 +49,7 @@ class App extends React.Component<Props, State> {
         currentWord: word, 
         currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition']
           .split(' ')
-          .map((w: string) => w.toLowerCase().replace(/;/gm, '') as Lowercase<string>)
+          .map((w: string) => cleanString(w))
       }, () => console.log(this.state.currentDefinition)))
   }
 
@@ -58,7 +59,7 @@ class App extends React.Component<Props, State> {
         guesses: [
           ...prevState.guesses, 
           {
-            'value': guess.map(w => w.toLowerCase() as Lowercase<string>), 
+            'value': guess.map(w => cleanString(w)), 
             'similarity': similarity
           }
         ]

@@ -1,0 +1,1 @@
+export const cleanString = (s: string): Lowercase<string> => s.toLowerCase().replace(/;|,/gm, '') as Lowercase<string>
