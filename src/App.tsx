@@ -7,6 +7,7 @@ import { Guess } from './types';
 import { evaluatePhrase } from './API';
 import { cleanString } from './utils';
 import wordDictionary from './wordDictionary.json' 
+import { GuessTable } from './components/GuessTable';
 
 interface Props {
 
@@ -115,48 +116,10 @@ class App extends React.Component<Props, State> {
         </Row>
         <Row className='mt-5'>
           <Col className='d-flex justify-content-center'>
-            <table>
-              <tbody>
-                {
-                  this.state.guesses
-                  .sort((g1, g2) => g2.similarity - g1.similarity)
-                  .map(guess => {
-                    let letterCount = -1
-
-                    return (
-                      <tr>
-                        <td>
-                          {
-                            guess.value
-                            .map((word: string, idx: number) => `${console.log(word)}` && (
-                              <>
-                                <span 
-                                  style={{backgroundColor: 
-                                    this.state.currentDefinition[idx] === word
-                                      ? 'green'
-                                      : this.state.currentDefinition.some(w => w === word) 
-                                        ? 'orange'
-                                        : 'red'
-                                }}>
-                                  {word}
-                                </span>
-                                {
-                                  letterCount++ 
-                                  && ['.',',',';'].includes(this.state.originalDefinitionString[letterCount]) 
-                                  && this.state.originalDefinitionString.split('')[letterCount++]
-                                }
-                                &nbsp;
-                              </>
-                            ))
-                          }
-                        </td>
-                        <td>{guess.similarity}%</td>
-                      </tr>
-                    )
-                  })
-                }
-              </tbody>
-            </table>
+            <GuessTable
+              guesses={this.state.guesses}
+              currentDefinition={this.state.currentDefinition}
+            />
           </Col>
         </Row>
       </Container>

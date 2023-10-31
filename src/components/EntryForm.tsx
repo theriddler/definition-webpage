@@ -3,7 +3,6 @@ import { evaluatePhrase } from "../API";
 import { Guess } from "../types";
 import { cleanString } from "../utils";
 
-
 interface EntryFormProps {
   guesses: Guess[];
   currentDefinition: string[];
@@ -26,9 +25,8 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
   }
 
   render(){
-    let letterCount = -1; 
     return (
-      <form onSubmit={(event) => {event.preventDefault()}} className="entry-form">
+      <form onSubmit={(event) => {event.preventDefault(); document.getElementById("submit")?.click();}} className="entry-form">
         <span>
           <input 
             id={`guess_input`} 
@@ -63,6 +61,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
             id='submit'
             type='submit'
             className="mt-5"
+            onSubmit={function(){return false}}
             onClick={() => {
               
               // get our input object
@@ -70,7 +69,6 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
 
               // clean and split
               let guess = cleanString(input).split(' ') as Lowercase<string>[]
-              console.log(guess)
               
               // evaluate and set our guess to state
               evaluatePhrase(guess, this.props.currentDefinition)
@@ -92,8 +90,6 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
               let randomWord = unfoundWords[randomWordIndex]?.w
               let guessToAddTo = this.props.guesses.find(g => g.value[randomWordIndex] !== randomWord)?.value || Array(this.props.currentDefinition.length).join('.').split('.')
               let guessThatIsNowHint = (guessToAddTo.splice(randomWordIndex, 0, randomWord) || '') as Lowercase<string>[]
-
-              console.log(randomWordIndex)
               
               if(guessThatIsNowHint)
                 evaluatePhrase(guessThatIsNowHint, this.props.currentDefinition)
