@@ -15,6 +15,7 @@ interface State {
   res: any;
   currentWord: string;
   currentDefinition: string[];
+  originalDefinitionString: string;
   guesses: Guess[];
 }
 
@@ -33,6 +34,7 @@ class App extends React.Component<Props, State> {
       res: null,
       guesses: [],
       currentDefinition: [],
+      originalDefinitionString: '',
       currentWord: ''
     }
   }
@@ -47,9 +49,10 @@ class App extends React.Component<Props, State> {
       .then(res => res.json())
       .then(data => this.setState({
         currentWord: word, 
+        originalDefinitionString: data[0]['meanings'][0]?.['definitions'][0]['definition'],
         currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition']
           .split(' ')
-          .map((w: string) => cleanString(w))
+          .map((w: string) => cleanString(w)),
       }, () => console.log(this.state.currentDefinition)))
   }
 
@@ -72,12 +75,12 @@ class App extends React.Component<Props, State> {
       <Container className='my-5 text-center'>
         <Row>
           <Col>
-            <h2>Write the definition of this word</h2>
+            <h4>Write the definition of this word</h4>
           </Col>
         </Row>
         <Row className='mt-3'>
           <Col>
-            <h5 style={{color: 'purple'}}>{this.state.currentWord}</h5>
+            <h1 style={{color: 'purple'}}>{this.state.currentWord}</h1>
           </Col>
         </Row>
         <Row className='mt-3'>
@@ -85,6 +88,7 @@ class App extends React.Component<Props, State> {
             <EntryForm
               guesses={this.state.guesses}
               currentDefinition={this.state.currentDefinition}
+              originalDefinitionString={this.state.originalDefinitionString}
               setGuessToState={this.setGuessToState.bind(this)}
             />
           </Col>
@@ -96,36 +100,48 @@ class App extends React.Component<Props, State> {
                 {
                   this.state.guesses
                   .sort((g1, g2) => g2.similarity - g1.similarity)
-                  .map(guess => (
-                    <tr>
-                      <td>
-                        {
-                          guess.value
-                          .map((word: string, idx: number) => (
-                            <>
-                              <span 
-                                style={{backgroundColor: 
-                                  this.state.currentDefinition.findIndex(w => w === word) === idx
-                                    ? 'green'
-                                    : this.state.currentDefinition.some(w => w === word) 
-                                      ? 'orange'
-                                      : 'red'
-                              }}>
+                  .map(guess => {
+                    let letterCount = -1
+
+                    return (
+                      <tr>
+                        <td>
+                          {
+                            guess.value
+                            .map((word: string, idx: number) => (
+                              <>
+                                <span 
+                                  style={{backgroundColor: 
+                                    this.state.currentDefinition[idx] === word
+                                      ? 'green'
+                                      : this.state.currentDefinition.some(w => w === word) 
+                                        ? 'orange'
+                                        : 'red'
+                                }}>
+                                  {
+                                    this.state.currentDefinition[idx]
+                                      .split('')
+                                      .map((l,i) => {
+                                        letterCount++
+                                        return word.split('')[i] || '-';
+                                      })
+                                      .join('')
+                                  }
+                                </span>
                                 {
-                                  this.state.currentDefinition[idx]
-                                    .split('')
-                                    .map((l,i) => word.split('')[i] || '-')
-                                    .join('')
+                                  letterCount++ 
+                                  && ['.',',',';'].includes(this.state.originalDefinitionString[letterCount]) 
+                                  && this.state.originalDefinitionString.split('')[letterCount++]
                                 }
-                              </span>
-                              &nbsp;
-                            </>
-                          ))
-                        }
-                      </td>
-                      <td>{guess.similarity}%</td>
-                    </tr>
-                  ))
+                                &nbsp;
+                              </>
+                            ))
+                          }
+                        </td>
+                        <td>{guess.similarity}%</td>
+                      </tr>
+                    )
+                  })
                 }
               </tbody>
             </table>

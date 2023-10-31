@@ -7,6 +7,7 @@ import { cleanString } from "../utils";
 interface EntryFormProps {
   guesses: Guess[];
   currentDefinition: string[];
+  originalDefinitionString: string;
   setGuessToState: (guess: string[], similarity: number) => void;
 }
 
@@ -25,28 +26,35 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
   }
 
   render(){
+    let letterCount = -1; 
     return (
       <form onSubmit={(event) => {event.preventDefault()}}>
         {
           this.props.currentDefinition
-          .map((w: string, idx: number) => `${console.log(this.state.prevGuess, w)}` && (
-            <input 
-              id={`${idx}_guess`} 
-              type='text'
-              placeholder={w.split('').map(l => ' - ').join('')}
-              style={{
-                width: `${w.length*24}px`,
-                borderColor: 
-                  this.state.prevGuess?.value[idx] === w 
-                    ? 'green' 
-                    : this.props.currentDefinition.includes(this.state.prevGuess?.value[idx] || 'z')
-                      ? 'orange' 
-                      : !this.state.prevGuess?.value[idx]
-                        ? 'white' 
-                        : 'red'
-              }}
-              className="m-2"
-            />
+          .map((w: string, idx: number) => (letterCount += w.length) && (
+            <>
+              <input 
+                id={`${idx}_guess`} 
+                type='text'
+                placeholder={w.split('').map(l => ' - ').join('')}
+                style={{
+                  width: `${w.length*40}px`,
+                  borderColor: 
+                    this.state.prevGuess?.value[idx] === w 
+                      ? 'green' 
+                      : this.props.currentDefinition.includes(this.state.prevGuess?.value[idx] || 'z')
+                        ? 'orange' 
+                        : !this.state.prevGuess?.value[idx]
+                          ? 'white' 
+                          : 'red'
+                }}
+                className="m-2"
+              />
+              {
+                ['.',',',';'].includes(this.props.originalDefinitionString[++letterCount]) 
+                && this.props.originalDefinitionString.split('')[letterCount++]
+              }
+            </>
           ))
         }
         <br/>
