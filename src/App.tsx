@@ -75,15 +75,23 @@ class App extends React.Component<Props, State> {
       <Container className='my-5 text-center'>
         <Row>
           <Col>
-            <h4>Write the definition of this word</h4>
+            <h1>definition</h1>
           </Col>
         </Row>
-        <Row className='mt-3'>
+        <Row>
           <Col>
-            <h1 style={{color: 'purple'}}>{this.state.currentWord}</h1>
+            <p>
+              Define the word below in the spaces provided
+            </p>
           </Col>
         </Row>
-        <Row className='mt-3'>
+        <hr/>
+        <Row className='mt-5'>
+          <Col>
+            <h2 style={{color: 'purple'}}>{this.state.currentWord}</h2>
+          </Col>
+        </Row>
+        <Row className='mt-5'>
           <Col className=''>
             <EntryForm
               guesses={this.state.guesses}
@@ -93,7 +101,7 @@ class App extends React.Component<Props, State> {
             />
           </Col>
         </Row>
-        <Row className='mt-3'>
+        <Row className='mt-5'>
           <Col className='d-flex justify-content-center'>
             <table>
               <tbody>
