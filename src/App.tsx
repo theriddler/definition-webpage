@@ -1,6 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
+import './App.scss';
 import { Col, Container, Row } from 'reactstrap'
 import { EntryForm } from './components/EntryForm';
 import { Guess } from './types';
@@ -77,7 +77,7 @@ class App extends React.Component<Props, State> {
         </Row>
         <Row className='mt-3'>
           <Col>
-            <h5>{this.state.currentWord}</h5>
+            <h5 style={{color: 'purple'}}>{this.state.currentWord}</h5>
           </Col>
         </Row>
         <Row className='mt-3'>

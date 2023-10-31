@@ -16,3 +16,12 @@ input[type=text]{
 input[type=text]:focus{
   outline: inherit;
 }
+
+input[type=submit]{
+  border-color: purple;
+  border-radius: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
