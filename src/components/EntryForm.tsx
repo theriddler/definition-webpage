@@ -28,37 +28,37 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
   render(){
     let letterCount = -1; 
     return (
-      <form onSubmit={(event) => {event.preventDefault()}}>
-        {
-          this.props.currentDefinition
-          .map((w: string, idx: number) => (letterCount += w.length) && (
-            <>
-              <input 
-                id={`${idx}_guess`} 
-                type='text'
-                placeholder={w.split('').map(l => ' - ').join('')}
-                style={{
-                  width: `${w.length*40}px`,
-                  borderColor: 
-                    this.state.prevGuess?.value[idx] === w 
-                      ? 'green' 
-                      : this.props.currentDefinition.includes(this.state.prevGuess?.value[idx] || 'z')
-                        ? 'orange' 
-                        : !this.state.prevGuess?.value[idx]
-                          ? 'white' 
-                          : 'red'
-                }}
-                className="m-2"
-              />
-              {
-                ['.',',',';'].includes(this.props.originalDefinitionString[++letterCount]) 
-                && this.props.originalDefinitionString.split('')[letterCount++]
-              }
-            </>
-          ))
-        }
-        <br/>
-        <br/>
+      <form onSubmit={(event) => {event.preventDefault()}} className="entry-form">
+        <div className="d-flex justify-content-center align-items-end flex-wrap">
+          {
+            this.props.currentDefinition
+            .map((w: string, idx: number) => (letterCount += w.length) && (
+              <>
+                <input 
+                  id={`${idx}_guess`} 
+                  type='text'
+                  className="m-2"
+                  placeholder={w.split('').map(l => ' - ').join('')}
+                  style={{
+                    width: `${w.length*40}px`,
+                    borderColor: 
+                      this.state.prevGuess?.value[idx] === w 
+                        ? 'green' 
+                        : this.props.currentDefinition.includes(this.state.prevGuess?.value[idx] || 'z')
+                          ? 'orange' 
+                          : !this.state.prevGuess?.value[idx]
+                            ? 'white' 
+                            : 'red'
+                  }}
+                />
+                {
+                  ['.',',',';'].includes(this.props.originalDefinitionString[++letterCount]) 
+                  && <span>{this.props.originalDefinitionString.split('')[letterCount++]}&nbsp;</span>
+                }
+              </>
+            ))
+          }
+        </div>
         <input
           id='click'
           type='submit'
