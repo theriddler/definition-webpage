@@ -1,7 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.scss';
-import { Col, Container, Row } from 'reactstrap'
+import { Col, Container, Row, Spinner } from 'reactstrap'
 import { EntryForm } from './components/EntryForm';
 import { Guess } from './types';
 import { evaluatePhrase } from './API';
@@ -17,6 +17,7 @@ interface State {
   currentDefinition: string[];
   originalDefinitionString: string;
   guesses: Guess[];
+  spinner: boolean;
 }
 
 
@@ -35,13 +36,14 @@ class App extends React.Component<Props, State> {
       guesses: [],
       currentDefinition: [],
       originalDefinitionString: '',
-      currentWord: ''
+      currentWord: '',
+      spinner: true
     }
   }
 
   componentDidMount(): void {
     this.chooseWord('ambidextrous')
-    evaluatePhrase(this.state.currentDefinition, this.state.currentDefinition)
+    evaluatePhrase(this.state.currentDefinition, this.state.currentDefinition).then(res => this.setState({spinner: false}))
   }
 
   chooseWord(word: string): void {
@@ -71,7 +73,7 @@ class App extends React.Component<Props, State> {
   }
 
   render() {
-    return (
+    return !this.state.spinner ? (
       <Container className='my-5 text-center'>
         <Row>
           <Col>
@@ -156,7 +158,7 @@ class App extends React.Component<Props, State> {
           </Col>
         </Row>
       </Container>
-    )
+    ) : <div style={{height:'100vh'}} className='d-flex justify-content-center align-items-center'><Spinner/></div>
   };
 }
 
