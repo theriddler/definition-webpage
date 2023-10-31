@@ -4,6 +4,7 @@ import './App.css';
 import { Col, Container, Row } from 'reactstrap'
 import { EntryForm } from './components/EntryForm';
 import { Guess } from './types';
+import { evaluatePhrase } from './API';
 
 interface Props {
 
@@ -37,6 +38,7 @@ class App extends React.Component<Props, State> {
 
   componentDidMount(): void {
     this.chooseWord('ambidextrous')
+    evaluatePhrase(this.state.currentDefinition, this.state.currentDefinition)
   }
 
   chooseWord(word: string): void {
@@ -44,7 +46,7 @@ class App extends React.Component<Props, State> {
       .then(res => res.json())
       .then(data => this.setState({
         currentWord: word, 
-        currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition'].split(' ')
+        currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition'].split(' ').map((w: string) => w.replace(/;/gm, ''))
       }, () => console.log(this.state.currentDefinition)))
   }
 
@@ -100,11 +102,11 @@ class App extends React.Component<Props, State> {
                             <>
                               <span 
                                 style={{backgroundColor: 
-                                  !this.state.currentDefinition.some(w => w.toLowerCase() === word.toLowerCase()) 
-                                  ? 'red'
-                                  : this.state.currentDefinition.findIndex(w => w.toLowerCase() === word.toLowerCase()) === idx
+                                  this.state.currentDefinition.findIndex(w => w.toLowerCase() === word.toLowerCase()) === idx
                                     ? 'green'
-                                    : 'yellow'
+                                    : this.state.currentDefinition.some(w => `${console.log(w,word)}` && w.toLowerCase() === word.toLowerCase()) 
+                                      ? 'orange'
+                                      : 'red'
                               }}>
                                 {word}
                               </span>

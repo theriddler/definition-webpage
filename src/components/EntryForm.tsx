@@ -34,17 +34,18 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
       <form onSubmit={(event) => {event.preventDefault()}}>
         {
           this.props.currentDefinition
-          .map((w: string, idx: number) => `${console.log(this.props.guesses)}` && (
+          .map((w: string, idx: number) => (
             <input 
               id={`${idx}_guess`} 
               type='text'
+              placeholder={w.split('').map(l => '-').join('')}
               style={{
-                width: `${w.length}em`,
+                width: `${w.length*18}px`,
                 borderColor: 
                   this.state.prevGuess?.value[idx] === w 
                     ? 'green' 
-                    : this.props.currentDefinition[idx].includes(this.state.prevGuess?.value[idx] || 'z')
-                      ? 'yellow' 
+                    : this.props.currentDefinition.includes(this.state.prevGuess?.value[idx] || 'z')
+                      ? 'orange' 
                       : !this.state.prevGuess?.value[idx]
                         ? 'white' 
                         : 'red'

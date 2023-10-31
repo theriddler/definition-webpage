@@ -8,7 +8,9 @@ table td {
 }
 
 input[type=text]{
+  font-size: 20px;
   border-radius: 5px;
+  text-align: center;
 }
 
 input[type=text]:focus{
