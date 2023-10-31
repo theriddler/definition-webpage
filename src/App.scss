@@ -1,6 +1,16 @@
+$primary: purple;
+$secondary: white;
+
 html *{ 
   background-color: black;
-  color: white; 
+  color: $secondary; 
+}
+
+h1{
+}
+
+h3{
+  font-weight: 100;
 }
 
 table td {
@@ -8,20 +18,32 @@ table td {
 }
 
 .entry-form {
-  font-size: 36px;
+  font-size: 24px;
 }
 
-input[type=text]{
+.textarea-container {
+  border: 0;
+  width: 100%;
+  min-height: 48px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+textarea{
   padding: 0;
   font-size: 36px;
   border-radius: 5px;
   margin-right: 10px;
-  // letter-spacing: 12px;
+  vertical-align: top;
   font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
 
-input[type=text]:focus{
-  outline: inherit;
+textarea:focus{
+  outline: 0;
+  border: 1px solid $secondary;
+  word-wrap: break-word;
+  white-space: wrap;
+  scrollbar-width: 0px;
 }
 
 button {
@@ -31,12 +53,12 @@ button {
   padding-right: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
-  border-color: purple;
+  border-color: $primary;
 }
 
 input[type=submit]{
   @extend button;
   font-size: 24px;
-  border-color: purple;
+  border-color: $primary;
 }
 

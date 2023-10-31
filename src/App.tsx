@@ -94,7 +94,7 @@ class App extends React.Component<Props, State> {
         <Row>
           <Col>
             <p>
-              Define the word below in the spaces provided
+              <strong>Define the word below in the space provided</strong>
             </p>
           </Col>
         </Row>

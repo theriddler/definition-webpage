@@ -37,12 +37,19 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
 
   render(){
     return (
-      <form onSubmit={(event) => {document.getElementById("guess_submit")?.click(); event.preventDefault(); }} className="entry-form">
-        <span>
-          <input 
+      <form onSubmit={(event) => {document.getElementById("guess_submit")?.click(); event.preventDefault(); }}>
+        <div className="textarea-container">
+          <textarea 
             id={`guess_input`} 
-            type='text'
-            className="w-100 mx-2 text-center"
+            className="w-100 h-100 p-0 text-center"
+            onKeyDownCapture={(e) => {
+              if (e.key === "Enter" && !e.shiftKey)
+                e.preventDefault()
+            }}
+            onKeyUpCapture={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) 
+                document.getElementById("guess_submit")?.click()
+            }}
             // placeholder={w.split('').map((l: string) => '-').join('')}
             // style={{
             //   borderColor: 
@@ -55,11 +62,11 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
             //           : 'red'
             // }}
           />
-          {/* {
-            ['.',',',';'].includes(this.props.originalDefinitionString[++letterCount]) 
-            && <span>{this.props.originalDefinitionString.split('')[letterCount++]}&nbsp;</span>
-          } */}
-        </span> 
+        </div>
+        {/* {
+          ['.',',',';'].includes(this.props.originalDefinitionString[++letterCount]) 
+          && <span>{this.props.originalDefinitionString.split('')[letterCount++]}&nbsp;</span>
+        } */}
         <div className='d-flex justify-content-center align-items-end' style={{gap: '50px'}}>
           <input
             id='guess_hint'
