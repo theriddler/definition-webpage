@@ -5,6 +5,7 @@ import { cleanString } from "../utils";
 
 interface EntryFormProps {
   guesses: Guess[];
+  previousGuess?: Guess;
   currentDefinition: string[];
   originalDefinitionString: string;
   addGuessToState: (guess: string[], similarity: number) => void;
@@ -28,17 +29,19 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
     let cleanedGuess = guess.filter(w => w) as Lowercase<string>[]
 
     // put guess into text area (in case this was triggered by a hint)
-    (document.getElementById('guess_input') as HTMLInputElement).value = cleanedGuess.join(' ')
+    (document.getElementById('guess_input') as HTMLDivElement).innerText = cleanedGuess.join(' ')
 
     // add to our parent, filtering on empty strings
-    this.props.addGuessToState(cleanedGuess, similarity);
+    // if(!this.props.guesses.some(g => g.value.length === cleanedGuess.length && g.value.every((w,idx) => w === cleanedGuess[idx])))
+      this.props.addGuessToState(cleanedGuess, similarity);
   }
 
   render(){
     return (
       <form id='guess_form'onSubmit={(event) => event.preventDefault()}>
         <div className="textarea-container">
-          <textarea 
+          <div
+            contentEditable 
             id={`guess_input`} 
             className="w-100 h-100 p-0 text-center"
             onKeyDownCapture={(e) => {
@@ -49,23 +52,9 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
               if (e.key === "Enter" && !e.shiftKey) 
                 document.getElementById("guess_submit")?.click()
             }}
-            // placeholder={w.split('').map((l: string) => '-').join('')}
-            // style={{
-            //   borderColor: 
-            //     this.state.prevGuess?.value[idx] === w 
-            //       ? 'green' 
-            //       : this.props.currentDefinition.includes(this.state.prevGuess?.value[idx] || 'z')
-            //         ? 'orange' 
-            //         : !this.state.prevGuess?.value[idx]
-            //           ? 'white' 
-            //           : 'red'
-            // }}
-          />
+          >
+          </div>
         </div>
-        {/* {
-          ['.',',',';'].includes(this.props.originalDefinitionString[++letterCount]) 
-          && <span>{this.props.originalDefinitionString.split('')[letterCount++]}&nbsp;</span>
-        } */}
         <div className='d-flex justify-content-center align-items-end' style={{gap: '50px'}}>
           <input
             id='guess_hint'
@@ -73,17 +62,22 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
             value='Hint'
             style={{fontSize:'16px'}}
             onClick={() => {
-              let randomWordIndex = Math.floor(Math.random() * this.props.currentDefinition.length)
-              let randomWord = cleanString(this.props.currentDefinition[randomWordIndex])
+              let [hintWords, hintIndexes] = this.props.currentDefinition
+                .map((w:string,idx:number) => ({w:w, idx:idx}))
+                .filter((w) => w.w !== this.props.previousGuess?.value[w.idx])
+                .reduce((acc: [hintWords: string[], hintIndexes: number[]],w) => {
+                  acc[0].push(w.w); 
+                  acc[1].push(w.idx); 
+                  return acc;
+                }, [[],[]])
+
+              let randomIndex = Math.floor(Math.random() * (hintIndexes.length-1))
+              let hintWordIndex = hintIndexes[randomIndex]
+              let hintWord = cleanString(hintWords[randomIndex])
               
-              if(randomWord){
-                let guessThatIsNowHint: Lowercase<string>[] = this.props.guesses
-                  .find(g => g.value[randomWordIndex] !== randomWord)?.value || Array(this.props.currentDefinition.length)
-                  .join('.')
-                  .split('.')
-                  .map((s:string) => cleanString(s))
-                  
-                guessThatIsNowHint.splice(randomWordIndex, -1, randomWord)
+              if(hintWord){
+                let guessThatIsNowHint: Lowercase<string>[] = this.props.previousGuess?.value || Array(this.props.currentDefinition.length)                  
+                guessThatIsNowHint.splice(hintWordIndex, 1, hintWord)
                 
                 evaluatePhrase(guessThatIsNowHint, this.props.currentDefinition)
                   .then(res => this.makeGuess(Object.assign(guessThatIsNowHint), parseFloat(res.similarity)))
@@ -95,9 +89,9 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
             id='guess_submit'
             type='submit'
             className="mt-5"
-            onClick={() => { console.log('here')
+            onClick={() => {
               // get our input object
-              let input = (document.getElementById(`guess_input`) as HTMLInputElement).value
+              let input = (document.getElementById(`guess_input`) as HTMLDivElement).innerText
 
               // clean, split and filter spaces out
               let guess = cleanString(input).split(' ').filter(w => w) as Lowercase<string>[]
@@ -113,7 +107,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
             type='button'
             value='Reset'
             style={{fontSize:'16px'}}
-            onClick={() => (document.getElementById('guess_form') as HTMLFormElement).reset()}//(document.getElementById('guess_input') as HTMLInputElement)!.value = ''}}
+            onClick={() => (document.getElementById('guess_form') as HTMLFormElement).reset()}//(document.getElementById('guess_input') as HTMLDivElement)!.innerText = ''}}
           />
         </div>
       </form>

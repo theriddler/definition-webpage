@@ -18,6 +18,7 @@ interface State {
   currentDefinition: Lowercase<string>[];
   originalDefinitionString: string;
   guesses: Guess[];
+  previousGuess?: Guess;
   spinner: boolean;
 }
 
@@ -33,10 +34,11 @@ class App extends React.Component<Props, State> {
     super(p);
 
     this.state = {
-      guesses: [],
+      currentWord: '',
       currentDefinition: [],
       originalDefinitionString: '',
-      currentWord: '',
+      guesses: [],
+      previousGuess: undefined,
       spinner: true
     }
   }
@@ -50,7 +52,6 @@ class App extends React.Component<Props, State> {
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    console.log(this.state.guesses)
     if(prevState.currentDefinition !== this.state.currentDefinition){
       console.log('updated')
     }
@@ -65,22 +66,21 @@ class App extends React.Component<Props, State> {
         currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition']
           .split(' ')
           .map((w: string) => cleanString(w)),
-      }))
+      }, () => console.log(this.state.currentDefinition)))
   }
 
-  addGuessToState(guess: string[], similarity: number) {
+  addGuessToState(guessArray: string[], similarity: number) {
     this.setState((prevState) => { 
-      console.log('adding', prevState.guesses)
-      return {
-        guesses: [
-          ...prevState.guesses, 
-          {
-            'value': guess.map(w => cleanString(w)), 
-            'similarity': similarity
-          }
-        ]
+      let guess = {
+        'value': guessArray.map((w: string) => cleanString(w)), 
+        'similarity': similarity
       }
-    }, () => console.log('done', this.state.guesses))
+
+      return {
+        guesses: [...prevState.guesses, guess],
+        previousGuess: guess
+      }
+    })
   }
 
   render() {
