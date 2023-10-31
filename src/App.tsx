@@ -7,6 +7,7 @@ import { Guess } from './types';
 import { evaluatePhrase } from './API';
 import { cleanString } from './utils';
 import wordDictionary from './wordDictionary.json' 
+import { GuessTable } from './components/GuessTable';
 
 interface Props {
 
@@ -43,26 +44,29 @@ class App extends React.Component<Props, State> {
   }
 
   componentDidMount(): void {
-    this.chooseWord(wordDictionary[Math.floor(Math.random()*wordDictionary.length)])
+    // choose a random word
+    this.chooseNewWord(wordDictionary[Math.floor(Math.random()*wordDictionary.length)])
+
+    // warm up lambda function
     evaluatePhrase(this.state.currentDefinition, this.state.currentDefinition).then(res => this.setState({spinner: false}))
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
     if(prevState.currentDefinition !== this.state.currentDefinition){
-      console.log(this.state.currentDefinition)
+      console.log('updated')
     }
   }
 
-  chooseWord(word: string): void {
+  chooseNewWord(word: string): void {
     fetch(wordDefinitionOptions(word).url, wordDefinitionOptions(word))
       .then(res => res.json())
       .then(data => this.setState({
-        currentWord: word, 
+        currentWord: cleanString(word), 
         originalDefinitionString: data[0]['meanings'][0]?.['definitions'][0]['definition'],
         currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition']
           .split(' ')
           .map((w: string) => cleanString(w)),
-      }, () => console.log(this.state.currentDefinition)))
+      }))
   }
 
   addGuessToState(guess: string[], similarity: number) {
@@ -90,7 +94,7 @@ class App extends React.Component<Props, State> {
         <Row>
           <Col>
             <p>
-              Define the word below in the spaces provided
+              <strong>Define the word below in the space provided</strong>
             </p>
           </Col>
         </Row>
@@ -101,7 +105,7 @@ class App extends React.Component<Props, State> {
           </Col>
         </Row>
         <Row className='mt-5'>
-          <Col className=''>
+          <Col>
             <EntryForm
               guesses={this.state.guesses}
               currentDefinition={this.state.currentDefinition}
@@ -110,89 +114,12 @@ class App extends React.Component<Props, State> {
             />
           </Col>
         </Row>
-        <Row className='mt-3'>
-          <Col>
-            <div className='d-flex justify-content-center' style={{gap: '20px'}}>
-              <button
-                onClick={() => {
-                  let unfoundWords = this.state.currentDefinition
-                    .map((w: Lowercase<string>, idx: number) => ({w:w, idx:idx}))
-                    .filter((word: {w: Lowercase<string>, idx: number}) => !this.state.guesses.some(g => g.value.includes(word.w)))
-
-                  let randomWordIndex = Math.floor(Math.random() * unfoundWords.length)
-                  let randomWord = unfoundWords[randomWordIndex].w
-                  let guessToAddTo = this.state.guesses.find(g => g.value[randomWordIndex] !== randomWord)?.value || Array(this.state.currentDefinition.length).join('.').split('.')
-                  let guessThatIsNowHint = (guessToAddTo.splice(randomWordIndex, 0, randomWord) || '') as Lowercase<string>[]
-
-                  console.log(randomWordIndex)
-                  
-                  if(guessThatIsNowHint)
-                    evaluatePhrase(guessThatIsNowHint, this.state.currentDefinition)
-                      .then(res => this.addGuessToState(guessThatIsNowHint, parseFloat(res.similarity)))
-                      .catch(err => console.log(err))
-                    
-                }}
-              >
-                Hint
-              </button>
-              <button>
-                Clear
-              </button>
-            </div>
-          </Col>
-        </Row>
         <Row className='mt-5'>
           <Col className='d-flex justify-content-center'>
-            <table>
-              <tbody>
-                {
-                  this.state.guesses
-                  .sort((g1, g2) => g2.similarity - g1.similarity)
-                  .map(guess => {
-                    let letterCount = -1
-
-                    return (
-                      <tr>
-                        <td>
-                          {
-                            guess.value
-                            .map((word: string, idx: number) => (
-                              <>
-                                <span 
-                                  style={{backgroundColor: 
-                                    this.state.currentDefinition[idx] === word
-                                      ? 'green'
-                                      : this.state.currentDefinition.some(w => w === word) 
-                                        ? 'orange'
-                                        : 'red'
-                                }}>
-                                  {
-                                    this.state.currentDefinition[idx]
-                                      .split('')
-                                      .map((l,i) => {
-                                        letterCount++
-                                        return word?.split('')[i] || '-';
-                                      })
-                                      .join('')
-                                  }
-                                </span>
-                                {
-                                  letterCount++ 
-                                  && ['.',',',';'].includes(this.state.originalDefinitionString[letterCount]) 
-                                  && this.state.originalDefinitionString.split('')[letterCount++]
-                                }
-                                &nbsp;
-                              </>
-                            ))
-                          }
-                        </td>
-                        <td>{guess.similarity}%</td>
-                      </tr>
-                    )
-                  })
-                }
-              </tbody>
-            </table>
+            <GuessTable
+              guesses={this.state.guesses}
+              currentDefinition={this.state.currentDefinition}
+            />
           </Col>
         </Row>
       </Container>
