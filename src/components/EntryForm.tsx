@@ -8,7 +8,7 @@ interface EntryFormProps {
   guesses: Guess[];
   currentDefinition: string[];
   originalDefinitionString: string;
-  setGuessToState: (guess: string[], similarity: number) => void;
+  addGuessToState: (guess: string[], similarity: number) => void;
 }
 
 interface EntryFormState {
@@ -32,34 +32,37 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
         <div className="d-flex justify-content-center align-items-end flex-wrap" style={{gap:'20px'}}>
           {
             this.props.currentDefinition
-            .map((w: string, idx: number) => (letterCount += w.length) && (
-              <>
-                <span>
-                  <input 
-                    id={`${idx}_guess`} 
-                    type='text'
-                    className="ml-2 text-center"
-                    placeholder={w.split('').map(l => '-').join('')}
-                    maxLength={w.length}
-                    style={{
-                      width: `${w.length-0.2}em`,
-                      borderColor: 
-                        this.state.prevGuess?.value[idx] === w 
-                          ? 'green' 
-                          : this.props.currentDefinition.includes(this.state.prevGuess?.value[idx] || 'z')
-                            ? 'orange' 
-                            : !this.state.prevGuess?.value[idx]
-                              ? 'white' 
-                              : 'red'
-                    }}
-                  />
-                  {
-                    ['.',',',';'].includes(this.props.originalDefinitionString[++letterCount]) 
-                    && <span>&nbsp;{this.props.originalDefinitionString.split('')[letterCount++]}&nbsp;</span>
-                  }
-                </span> 
-              </>
-            ))
+            .map((w: string, idx: number) => {
+              letterCount += w.length;
+              return (
+                <>
+                  <span>
+                    <input 
+                      id={`${idx}_guess`} 
+                      type='text'
+                      className="ml-2 text-center"
+                      placeholder={w.split('').map(l => '-').join('')}
+                      maxLength={w.length}
+                      style={{
+                        width: `${w.length-0.2}em`,
+                        borderColor: 
+                          this.state.prevGuess?.value[idx] === w 
+                            ? 'green' 
+                            : this.props.currentDefinition.includes(this.state.prevGuess?.value[idx] || 'z')
+                              ? 'orange' 
+                              : !this.state.prevGuess?.value[idx]
+                                ? 'white' 
+                                : 'red'
+                      }}
+                    />
+                    {
+                      ['.',',',';'].includes(this.props.originalDefinitionString[++letterCount]) 
+                      && <span>{this.props.originalDefinitionString.split('')[letterCount++]}&nbsp;</span>
+                    }
+                  </span> 
+                </>
+             )
+            })
           }
         </div>
         <input
@@ -73,12 +76,12 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
               .map((w: string, idx: number) => (document.getElementById(`${idx}_guess`) as HTMLInputElement))
 
             // reassemble the user's input
-            let guess = inputs.map(w => cleanString(w.value))
+            let guess = inputs.map(i =>`${console.log(i)}` && cleanString(i.value))
             
             // evaluate and set our guess to state
             evaluatePhrase(guess, this.props.currentDefinition)
               .then((res) => {
-                this.props.setGuessToState(guess, parseFloat(res.similarity))
+                this.props.addGuessToState(guess, parseFloat(res.similarity))
                 this.setState({prevGuess: {value: guess, similarity: parseFloat(res.similarity)}})
               })
               .catch((err: Error) => console.log(err));
