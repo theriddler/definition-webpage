@@ -15,8 +15,7 @@ input[type=text]{
   padding: 0;
   font-size: 36px;
   border-radius: 5px;
-  margin-left: 20px;
-  margin-right: 20px;
+  margin-right: 10px;
   // letter-spacing: 12px;
   font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
@@ -25,12 +24,19 @@ input[type=text]:focus{
   outline: inherit;
 }
 
-input[type=submit]{
-  font-size: 24px;
-  border-color: purple;
+button {
+  font-size: 16px;
   border-radius: 5px;
   padding-left: 10px;
   padding-right: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
+  border-color: orange;
 }
+
+input[type=submit]{
+  @extend button;
+  font-size: 24px;
+  border-color: purple;
+}
+

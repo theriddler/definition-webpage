@@ -76,7 +76,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
               .map((w: string, idx: number) => (document.getElementById(`${idx}_guess`) as HTMLInputElement))
 
             // reassemble the user's input
-            let guess = inputs.map(i =>`${console.log(i)}` && cleanString(i.value))
+            let guess = inputs.map(i => cleanString(i.value))
             
             // evaluate and set our guess to state
             evaluatePhrase(guess, this.props.currentDefinition)

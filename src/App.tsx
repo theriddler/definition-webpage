@@ -15,7 +15,7 @@ interface Props {
 interface State {
   res: any;
   currentWord: string;
-  currentDefinition: string[];
+  currentDefinition: Lowercase<string>[];
   originalDefinitionString: string;
   guesses: Guess[];
   spinner: boolean;
@@ -47,6 +47,12 @@ class App extends React.Component<Props, State> {
     evaluatePhrase(this.state.currentDefinition, this.state.currentDefinition).then(res => this.setState({spinner: false}))
   }
 
+  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+    if(prevState.currentDefinition !== this.state.currentDefinition){
+      console.log(this.state.currentDefinition)
+    }
+  }
+
   chooseWord(word: string): void {
     fetch(wordDefinitionOptions(word).url, wordDefinitionOptions(word))
       .then(res => res.json())
@@ -59,7 +65,7 @@ class App extends React.Component<Props, State> {
       }, () => console.log(this.state.currentDefinition)))
   }
 
-  setGuessToState(guess: string[], similarity: number) {
+  addGuessToState(guess: string[], similarity: number) {
     this.setState((prevState) => { 
       return {
         guesses: [
@@ -100,8 +106,39 @@ class App extends React.Component<Props, State> {
               guesses={this.state.guesses}
               currentDefinition={this.state.currentDefinition}
               originalDefinitionString={this.state.originalDefinitionString}
-              setGuessToState={this.setGuessToState.bind(this)}
+              addGuessToState={this.addGuessToState.bind(this)}
             />
+          </Col>
+        </Row>
+        <Row className='mt-3'>
+          <Col>
+            <div className='d-flex justify-content-center' style={{gap: '20px'}}>
+              <button
+                onClick={() => {
+                  let unfoundWords = this.state.currentDefinition
+                    .map((w: Lowercase<string>, idx: number) => ({w:w, idx:idx}))
+                    .filter((word: {w: Lowercase<string>, idx: number}) => !this.state.guesses.some(g => g.value.includes(word.w)))
+
+                  let randomWordIndex = Math.floor(Math.random() * unfoundWords.length)
+                  let randomWord = unfoundWords[randomWordIndex].w
+                  let guessToAddTo = this.state.guesses.find(g => g.value[randomWordIndex] !== randomWord)?.value || Array(this.state.currentDefinition.length).join('.').split('.')
+                  let guessThatIsNowHint = (guessToAddTo.splice(randomWordIndex, 0, randomWord) || '') as Lowercase<string>[]
+
+                  console.log(randomWordIndex)
+                  
+                  if(guessThatIsNowHint)
+                    evaluatePhrase(guessThatIsNowHint, this.state.currentDefinition)
+                      .then(res => this.addGuessToState(guessThatIsNowHint, parseFloat(res.similarity)))
+                      .catch(err => console.log(err))
+                    
+                }}
+              >
+                Hint
+              </button>
+              <button>
+                Clear
+              </button>
+            </div>
           </Col>
         </Row>
         <Row className='mt-5'>
@@ -134,7 +171,7 @@ class App extends React.Component<Props, State> {
                                       .split('')
                                       .map((l,i) => {
                                         letterCount++
-                                        return word.split('')[i] || '-';
+                                        return word?.split('')[i] || '-';
                                       })
                                       .join('')
                                   }
