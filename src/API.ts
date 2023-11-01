@@ -1,6 +1,6 @@
 
 
-export function evaluatePhrase(guess: string[], truth: string[]): Promise<{similarity: string}> {
+export function evaluatePhrase(guess: string[], truth: string[] = []): Promise<{similarity: string}> {
   return new Promise((resolve, reject) => {
     fetch('https://tnuv44hsc0.execute-api.us-east-2.amazonaws.com/default/description_engine', {
       method: 'POST',
