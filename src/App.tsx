@@ -14,9 +14,10 @@ interface Props {
 }
 
 interface State {
-  currentWord: string;
-  currentDefinition: Lowercase<string>[];
-  originalDefinitionString: string;
+  currentWord?: string;
+  currentDefinition?: Lowercase<string>[];
+  originalDefinitionString?: string;
+  originalDefinitionData?: {results: any};
   guesses: Guess[];
   previousGuess?: Guess;
   spinner: boolean;
@@ -34,9 +35,10 @@ class App extends React.Component<Props, State> {
     super(p);
 
     this.state = {
-      currentWord: '',
+      currentWord: undefined,
       currentDefinition: [],
-      originalDefinitionString: '',
+      originalDefinitionString: undefined,
+      originalDefinitionData: undefined,
       guesses: [],
       previousGuess: undefined,
       spinner: true
@@ -48,7 +50,7 @@ class App extends React.Component<Props, State> {
     this.chooseNewWord(wordDictionary[Math.floor(Math.random()*wordDictionary.length)])
 
     // warm up lambda function
-    evaluatePhrase(this.state.currentDefinition, this.state.currentDefinition).then(res => this.setState({spinner: false}))
+    evaluatePhrase(['x'],['y']).then(res => this.setState({spinner: false}))
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -62,10 +64,11 @@ class App extends React.Component<Props, State> {
       .then(res => res.json())
       .then(data => this.setState({
         currentWord: cleanString(word), 
-        originalDefinitionString: data[0]['meanings'][0]?.['definitions'][0]['definition'],
         currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition']
           .split(' ')
           .map((w: string) => cleanString(w)),
+        originalDefinitionString: data[0]['meanings'][0]?.['definitions'][0]['definition'],
+        originalDefinitionData: data
       }, () => console.log(this.state.currentDefinition)))
   }
 
@@ -85,44 +88,44 @@ class App extends React.Component<Props, State> {
 
   render() {
     return !this.state.spinner ? (
-      <Container className='my-5 text-center'>
-        <Row>
-          <Col>
-            <h3>definition</h3>
-          </Col>
-        </Row>
-        <Row>
-          <Col>
-            <p>
-              Define the word below in the space provided
-            </p>
-          </Col>
-        </Row>
+      <div>
+        <div className='text-center mt-3 mb-2'>
+          <h3>definition</h3>
+        </div>
+        <div className='text-center mb-3'>
+          <p>
+            Define the word below in the space provided
+          </p>
+        </div>
         <hr/>
-        <Row className='mt-5'>
-          <Col>
-            <h1 style={{color: 'purple'}}>{this.state.currentWord}</h1>
-          </Col>
-        </Row>
-        <Row className='mt-5'>
-          <Col>
-            <EntryForm
-              guesses={this.state.guesses}
-              currentDefinition={this.state.currentDefinition}
-              originalDefinitionString={this.state.originalDefinitionString}
-              addGuessToState={this.addGuessToState.bind(this)}
-            />
-          </Col>
-        </Row>
-        <Row className='mt-5'>
-          <Col className='d-flex justify-content-center'>
-            <GuessTable
-              guesses={this.state.guesses}
-              currentDefinition={this.state.currentDefinition}
-            />
-          </Col>
-        </Row>
-      </Container>
+        {/* <div className='pretty-lines'/> */}
+        <Container className='my-5 text-center'>
+          <Row className='mt-5'>
+            <Col>
+              <h1>{this.state.currentWord}</h1>
+            </Col>
+          </Row>
+          <Row className='mt-5'>
+            <Col>
+              <EntryForm
+                guesses={this.state.guesses}
+                previousGuess={this.state.previousGuess}
+                currentDefinition={this.state.currentDefinition}
+                originalDefinitionString={this.state.originalDefinitionString}
+                addGuessToState={this.addGuessToState.bind(this)}
+              />
+            </Col>
+          </Row>
+          <Row className='mt-5'>
+            <Col className='d-flex justify-content-center'>
+              <GuessTable
+                guesses={this.state.guesses}
+                currentDefinition={this.state.currentDefinition}
+              />
+            </Col>
+          </Row>
+        </Container>
+      </div>
     ) : <div style={{height:'100vh'}} className='d-flex justify-content-center align-items-center'><Spinner/></div>
   };
 }

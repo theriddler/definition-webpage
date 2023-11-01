@@ -6,8 +6,8 @@ import { cleanString } from "../utils";
 interface EntryFormProps {
   guesses: Guess[];
   previousGuess?: Guess;
-  currentDefinition: string[];
-  originalDefinitionString: string;
+  currentDefinition?: string[];
+  originalDefinitionString?: string;
   addGuessToState: (guess: string[], similarity: number) => void;
 }
 
@@ -26,26 +26,62 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
 
   makeGuess(guess: Lowercase<string>[], similarity: number){
     // filter out empty strings
-    let cleanedGuess = guess.filter(w => w) as Lowercase<string>[]
-
-    // put guess into text area (in case this was triggered by a hint)
-    (document.getElementById('guess_input') as HTMLDivElement).innerText = cleanedGuess.join(' ')
+    let cleanedGuess = guess.filter(w => w).map(w => cleanString(w))
 
     // add to our parent, filtering on empty strings
     // if(!this.props.guesses.some(g => g.value.length === cleanedGuess.length && g.value.every((w,idx) => w === cleanedGuess[idx])))
-      this.props.addGuessToState(cleanedGuess, similarity);
+    this.props.addGuessToState(cleanedGuess, similarity);
+
+    // put guess into textarea (in case this was triggered by a hint)
+    let guessInput = (document.getElementById('guess_input') as HTMLDivElement)
+
+    // format our textarea text
+    guessInput.innerText = cleanedGuess.join(' ')
+    guessInput!.innerHTML = cleanedGuess.map((word,idx) => `<span contenteditable="false" class="mx-2" style="color:${
+      this.props.currentDefinition?.[idx] === word
+        ? 'green'
+        : this.props.currentDefinition?.some(w => w === word)
+          ? 'orange'
+          : 'red'
+      };">${word}</span>`).join('')
+  }
+
+  makeHint(){
+    let [hintWords, hintIndexes] = (this.props.currentDefinition || [])
+      .map((w:string,idx:number) => ({w:w, idx:idx}))
+      .filter((w) => w.w !== this.props.previousGuess?.value[w.idx])
+      .reduce((acc: [hintWords: string[], hintIndexes: number[]],w) => {
+        acc[0].push(w.w); 
+        acc[1].push(w.idx); 
+        return acc;
+      }, [[],[]])
+
+    let randomIndex = Math.floor(Math.random() * (hintIndexes.length-1))
+    let hintWordIndex = hintIndexes[randomIndex]
+    let hintWord = cleanString(hintWords[randomIndex])
+    
+    if(hintWord){
+      let guessThatIsNowHint: Lowercase<string>[] = this.props.previousGuess?.value || Array(this.props.currentDefinition?.length)                  
+      guessThatIsNowHint.splice(hintWordIndex, 1, hintWord)
+      
+      evaluatePhrase(guessThatIsNowHint, this.props.currentDefinition)
+        .then(res => this.makeGuess(Object.assign(guessThatIsNowHint), parseFloat(res.similarity)))
+        .catch(err => console.log(err))
+    }
   }
 
   render(){
     return (
-      <form id='guess_form'onSubmit={(event) => event.preventDefault()}>
+      <form id='guess_form' onSubmit={(event) => event.preventDefault()}>
         <div className="textarea-container">
           <div
             contentEditable 
-            id={`guess_input`} 
-            className="w-100 h-100 p-0 text-center"
+            id='guess_input' 
             onKeyDownCapture={(e) => {
               if (e.key === "Enter" && !e.shiftKey)
+                e.preventDefault()
+
+              if(!e.code.includes('Key') && !e.code.includes('Arrow') && e.code !== 'Space' && e.code !== 'Backspace')
                 e.preventDefault()
             }}
             onKeyUpCapture={(e) => {
@@ -61,29 +97,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
             type='button'
             value='Hint'
             style={{fontSize:'16px'}}
-            onClick={() => {
-              let [hintWords, hintIndexes] = this.props.currentDefinition
-                .map((w:string,idx:number) => ({w:w, idx:idx}))
-                .filter((w) => w.w !== this.props.previousGuess?.value[w.idx])
-                .reduce((acc: [hintWords: string[], hintIndexes: number[]],w) => {
-                  acc[0].push(w.w); 
-                  acc[1].push(w.idx); 
-                  return acc;
-                }, [[],[]])
-
-              let randomIndex = Math.floor(Math.random() * (hintIndexes.length-1))
-              let hintWordIndex = hintIndexes[randomIndex]
-              let hintWord = cleanString(hintWords[randomIndex])
-              
-              if(hintWord){
-                let guessThatIsNowHint: Lowercase<string>[] = this.props.previousGuess?.value || Array(this.props.currentDefinition.length)                  
-                guessThatIsNowHint.splice(hintWordIndex, 1, hintWord)
-                
-                evaluatePhrase(guessThatIsNowHint, this.props.currentDefinition)
-                  .then(res => this.makeGuess(Object.assign(guessThatIsNowHint), parseFloat(res.similarity)))
-                  .catch(err => console.log(err))
-              }
-            }}
+            onClick={this.makeHint}
           />
           <input
             id='guess_submit'
@@ -91,10 +105,24 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
             className="mt-5"
             onClick={() => {
               // get our input object
-              let input = (document.getElementById(`guess_input`) as HTMLDivElement).innerText
+              let input = (document.getElementById(`guess_input`) as HTMLDivElement)
 
-              // clean, split and filter spaces out
-              let guess = cleanString(input).split(' ').filter(w => w) as Lowercase<string>[]
+              // bring our input.innerHTML into a temporary container
+              let tempEl = document.createElement("div")
+              tempEl.innerHTML = input.innerHTML.trim()
+
+              // clean, split and filter spaces/spans out
+              let guess: Lowercase<string>[] = []
+              
+              while (tempEl.lastChild) {
+                let firstChild = tempEl.firstChild as HTMLElement
+                firstChild.textContent
+                  ?.split(' ')
+                  .map((w:string) => cleanString(w))
+                  ?.filter(w => w)
+                  ?.forEach(w => guess.push(w))
+                tempEl.removeChild(firstChild);
+              }
               
               // evaluate and set our guess to state
               evaluatePhrase(guess, this.props.currentDefinition)

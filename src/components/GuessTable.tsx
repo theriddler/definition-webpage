@@ -3,13 +3,13 @@ import { Guess } from "../types";
 
 interface GuessTableProps {
   guesses: Guess[];
-  currentDefinition: Lowercase<string>[];
+  currentDefinition?: Lowercase<string>[];
 }
 
 export class GuessTable extends React.Component<GuessTableProps,{}>{
   render() {
     return (
-      <table>
+      <table className='guess-table'>
         <tbody>
           {
             this.props.guesses
@@ -23,10 +23,11 @@ export class GuessTable extends React.Component<GuessTableProps,{}>{
                       .map((word: string, idx: number) => (
                         <>
                           <span 
+                            className='d-inline-block guessed-word-display'
                             style={{backgroundColor: 
-                              this.props.currentDefinition[idx] === word
+                              this.props.currentDefinition?.[idx] === word
                                 ? 'green'
-                                : this.props.currentDefinition.some((w: Lowercase<string>) => w === word) 
+                                : this.props.currentDefinition?.some((w: Lowercase<string>) => w === word) 
                                   ? 'orange'
                                   : 'red'
                           }}>

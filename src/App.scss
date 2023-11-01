@@ -24,22 +24,27 @@ table td {
 
 .textarea-container {
   border: 0;
+  display: table;
   width: 100%;
   min-height: 48px;
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-textarea{
-  padding: 0;
+#guess_input{
+  height: 100%;
+  width: 100%;
+  padding: 10px;
+  text-align: center;
   font-size: 36px;
+  border: 1px dashed grey;
   border-radius: 5px;
   margin-right: 10px;
   vertical-align: center;
   font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
 
-textarea:focus{
+#guess_input:focus{
   outline: 0;
   border: 1px solid $secondary;
   word-wrap: break-word;
@@ -48,7 +53,6 @@ textarea:focus{
 }
 
 button {
-  font-size: 16px;
   border-radius: 5px;
   padding-left: 10px;
   padding-right: 10px;
@@ -60,6 +64,37 @@ button {
 input[type=submit]{
   @extend button;
   font-size: 24px;
-  border-color: $primary;
 }
 
+input[type=button]{
+  @extend button;
+  font-size: 16px;
+}
+
+.guess-table {
+  width: 100%;
+  table-layout: fixed;
+  white-space: wrap;
+}
+
+.guess-table tr td {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid white;
+  white-space: wrap;
+}
+
+.guess-table tr td:nth-child(1) {
+  text-align: left;
+}
+
+.guess-table tr td:nth-child(2) {
+  text-align: right;
+}
+
+.guessed-word-display {
+  padding: 1px 5px 1px 5px;
+  margin-left: 5px;
+  margin-right: 5px;
+  border-radius: 5px;
+}
