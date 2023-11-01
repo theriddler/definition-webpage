@@ -22,7 +22,7 @@ export class GuessTable extends React.Component<GuessTableProps,GuessTableState>
         {
           this.props.guesses
           .sort((g1, g2) => g2.similarity - g1.similarity)
-          .map(guess => <GuessTableRow key={Math.random().toString()} previousGuess={guess.value.every((w,idx) => w === this.props.previousGuess?.value[idx])} guess={guess} currentDefinition={this.props.currentDefinition || []}/>)
+          .map(guess => <GuessTableRow key={Math.random().toString()} previousGuess={guess.value.length === this.props.previousGuess?.value.length && guess.value.every((w,idx) => w === this.props.previousGuess?.value[idx])} guess={guess} currentDefinition={this.props.currentDefinition || []}/>)
         }
       </div>
     )
