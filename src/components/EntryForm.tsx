@@ -91,18 +91,17 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
           >
           </div>
         </div>
-        <div className='d-flex justify-content-center align-items-end' style={{gap: '50px'}}>
+        <div className='mt-5 d-flex justify-content-center align-items-center' style={{gap: '50px'}}>
           <input
             id='guess_hint'
             type='button'
             value='Hint'
             style={{fontSize:'16px'}}
-            onClick={this.makeHint}
+            onClick={this.makeHint.bind(this)}
           />
           <input
             id='guess_submit'
             type='submit'
-            className="mt-5"
             onClick={() => {
               // get our input object
               let input = (document.getElementById(`guess_input`) as HTMLDivElement)
