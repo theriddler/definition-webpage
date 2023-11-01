@@ -57,9 +57,9 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
         return acc;
       }, [[],[]])
 
-    let randomIndex = Math.floor(Math.random() * (hintIndexes.length-1))
-    let hintWordIndex = hintIndexes[randomIndex]
-    let hintWord = cleanString(hintWords[randomIndex])
+    // let randomIndex = Math.floor(Math.random() * (hintIndexes.length-1))
+    let hintWordIndex = hintIndexes[0] // do first possible hint for now
+    let hintWord = cleanString(hintWords[0])
     
     if(hintWord){
       let guessThatIsNowHint: Lowercase<string>[] = this.props.previousGuess?.value || Array(this.props.currentDefinition?.length)                  
