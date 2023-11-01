@@ -1,5 +1,17 @@
-$primary: purple;
+@use 'sass:math';
+
+$primary: white;
 $secondary: white;
+
+// change the theme
+$theme-colors: (
+  "primary": #0074d9,
+  "danger": #ff4136,
+  "warning":darkorange
+);
+
+// Import Bootstrap and its default variables
+@import '~bootstrap/scss/bootstrap.scss';
 
 html *{ 
   background-color: black;
@@ -12,6 +24,19 @@ h1{
 
 h3{
   font-weight: 100;
+}
+
+.pretty-lines {
+  position: absolute;
+  height: 100vh;
+  width: 50vw;
+  left: -50vw;
+  top: -50vh;
+  border-right: 2px solid red;
+  background-color:  red;
+  -moz-transform: skew(60deg);
+  -webkit-transform: skew(60deg);
+  transform: skew(60deg);
 }
 
 table td {
@@ -41,15 +66,12 @@ table td {
   border-radius: 5px;
   margin-right: 10px;
   vertical-align: center;
+  scrollbar-width: 0px;
   font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
 
 #guess_input:focus{
-  outline: 0;
   border: 1px solid $secondary;
-  word-wrap: break-word;
-  white-space: wrap;
-  scrollbar-width: 0px;
 }
 
 button {
@@ -75,12 +97,17 @@ input[type=button]{
   width: 100%;
   table-layout: fixed;
   white-space: wrap;
+  font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
+  font-size: 24px;
+}
+
+.guess-table tr {
+  border-bottom: 2px dotted white;
 }
 
 .guess-table tr td {
   padding-top: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid white;
   white-space: wrap;
 }
 

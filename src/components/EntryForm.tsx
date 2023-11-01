@@ -12,6 +12,7 @@ interface EntryFormProps {
 }
 
 interface EntryFormState {
+  savedRange?: Range;
 }
 
 export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
@@ -20,7 +21,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
     super(p);
     
     this.state = {
-
+      savedRange: undefined,
     }
   }
 
@@ -37,11 +38,11 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
 
     // format our textarea text
     guessInput.innerText = cleanedGuess.join(' ')
-    guessInput!.innerHTML = cleanedGuess.map((word,idx) => `<span contenteditable="false" class="mx-2" style="color:${
+    guessInput!.innerHTML = cleanedGuess.map((word,idx) => `<span class="mx-2" style="color:${
       this.props.currentDefinition?.[idx] === word
         ? 'green'
         : this.props.currentDefinition?.some(w => w === word)
-          ? 'orange'
+          ? 'darkorange'
           : 'red'
       };">${word}</span>`).join('')
   }
@@ -70,6 +71,25 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
     }
   }
 
+  saveSelection(){
+    if(window.getSelection)
+      this.setState({savedRange: window.getSelection()?.getRangeAt(0)})
+  }
+
+  restoreSelection(){
+    document.getElementById("guess_input")?.focus();
+    if (this.state.savedRange !== undefined) 
+      if (window.getSelection()){ // there is already a selection
+          var s = window.getSelection();
+          if ((s?.rangeCount || 0) > 0) 
+              s?.removeAllRanges();
+          s?.addRange(this.state.savedRange);
+      }
+      else if (document.createRange())// no selection
+        window.getSelection()?.addRange(this.state.savedRange);
+    
+}
+
   render(){
     return (
       <form id='guess_form' onSubmit={(event) => event.preventDefault()}>
@@ -91,7 +111,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
           >
           </div>
         </div>
-        <div className='mt-5 d-flex justify-content-center align-items-center' style={{gap: '50px'}}>
+        <div className='py-3 fixed-bottom d-flex justify-content-center align-items-center' style={{gap: '50px', backgroundColor: 'black'}}>
           <input
             id='guess_hint'
             type='button'

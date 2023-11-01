@@ -1,7 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.scss';
-import { Col, Container, Row, Spinner } from 'reactstrap'
+import { Badge, Card, CardBody, Col, Container, Row, Spinner } from 'reactstrap'
 import { EntryForm } from './components/EntryForm';
 import { Guess } from './types';
 import { evaluatePhrase } from './API';
@@ -17,7 +17,7 @@ interface State {
   currentWord?: string;
   currentDefinition?: Lowercase<string>[];
   originalDefinitionString?: string;
-  originalDefinitionData?: {results: any};
+  originalDefinitionData?: {antonyms: string[], definitions: {definition:string, example:string}[], partOfSpeech: string, synonyms: string[]};
   guesses: Guess[];
   previousGuess?: Guess;
   spinner: boolean;
@@ -68,8 +68,8 @@ class App extends React.Component<Props, State> {
           .split(' ')
           .map((w: string) => cleanString(w)),
         originalDefinitionString: data[0]['meanings'][0]?.['definitions'][0]['definition'],
-        originalDefinitionData: data
-      }, () => console.log(this.state.currentDefinition)))
+        originalDefinitionData: data[0]['meanings'][0]
+      }, () => console.log(this.state.originalDefinitionData)))
   }
 
   addGuessToState(guessArray: string[], similarity: number) {
@@ -97,12 +97,24 @@ class App extends React.Component<Props, State> {
             Define the word below in the space provided
           </p>
         </div>
-        <hr/>
+        <br/><br/><br/><br/><br/>
         {/* <div className='pretty-lines'/> */}
-        <Container className='my-5 text-center'>
-          <Row className='mt-5'>
-            <Col>
-              <h1>{this.state.currentWord}</h1>
+        <Container className='text-center'>
+          <Row>
+            <Col className='d-flex justify-content-center'>
+              <Card className='w-50'>
+                <CardBody>
+                  <Badge pill className='mx-3' color='warning'>
+                    {this.state.originalDefinitionData?.partOfSpeech}
+                  </Badge>
+                  <h1 className='mt-2'>
+                    {this.state.currentWord}
+                  </h1>
+                  <div className='mt-2'>
+                    {this.state.originalDefinitionData?.definitions[0].example}
+                  </div>
+                </CardBody>
+              </Card>
             </Col>
           </Row>
           <Row className='mt-5'>
