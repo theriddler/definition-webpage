@@ -1,5 +1,4 @@
 {
-  
   "compilerOptions": {
     "target": "es5",
     "lib": [
@@ -22,13 +21,14 @@
     "experimentalDecorators": true,
     "sourceMap": false,
     "strictPropertyInitialization": false,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
+    "allowJs": true
   },
   "include": [
     "src"
   ],
   "exclude": [
-    "node_modules", 
+    "node_modules",
     "node_modules/**/*"
   ]
 }
