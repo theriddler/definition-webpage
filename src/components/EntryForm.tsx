@@ -1,12 +1,12 @@
 import React from "react";
 import { evaluatePhrase } from "../API";
 import { Guess } from "../types";
-import { cleanString } from "../utils";
+import { cleanString, getResultColor } from "../utils";
 
 interface EntryFormProps {
   guesses: Guess[];
   previousGuess?: Guess;
-  currentDefinition?: string[];
+  currentDefinition?: Lowercase<string>[];
   originalDefinitionString?: string;
   addGuessToState: (guess: string[], similarity: number) => void;
 }
@@ -38,13 +38,11 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
 
     // format our textarea text
     guessInput.innerText = cleanedGuess.join(' ')
-    guessInput!.innerHTML = cleanedGuess.map((word,idx) => `<span class="mx-2" style="color:${
-      this.props.currentDefinition?.[idx] === word
-        ? 'green'
-        : this.props.currentDefinition?.some(w => w === word)
-          ? 'darkorange'
-          : 'red'
-      };">${word}</span>`).join('')
+    guessInput!.innerHTML = cleanedGuess.map((guessWord,idx) => 
+      `<span 
+        class="mx-2" 
+        style="color:${getResultColor(cleanedGuess, idx, this.props.currentDefinition)};"
+      >${guessWord}</span>`).join('')
   }
 
   makeHint(){

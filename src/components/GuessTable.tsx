@@ -1,5 +1,6 @@
 import React from 'react'
 import { Guess } from "../types";
+import { getResultColor } from '../utils';
 
 interface GuessTableProps {
   guesses: Guess[];
@@ -11,9 +12,9 @@ interface GuessTableState {
 }
 
 export class GuessTable extends React.Component<GuessTableProps,GuessTableState>{
-  constructor(p: GuessTableProps){
-    super(p);
-  }
+  // constructor(p: GuessTableProps){
+  //   super(p);
+  // }
 
   render() {
     return (
@@ -21,7 +22,7 @@ export class GuessTable extends React.Component<GuessTableProps,GuessTableState>
         {
           this.props.guesses
           .sort((g1, g2) => g2.similarity - g1.similarity)
-          .map(guess => <GuessTableRow key={guess.value.join('')} previousGuess={guess.value.every((w,idx) => w === this.props.previousGuess?.value[idx])} guess={guess} currentDefinition={this.props.currentDefinition || []}/>)
+          .map(guess => <GuessTableRow key={Math.random().toString()} previousGuess={guess.value.every((w,idx) => w === this.props.previousGuess?.value[idx])} guess={guess} currentDefinition={this.props.currentDefinition || []}/>)
         }
       </div>
     )
@@ -37,13 +38,7 @@ const GuessTableRow = (props: {guess: Guess, currentDefinition: Lowercase<string
           <span 
             key={`${word}_${idx}`}
             className='d-inline-block guessed-word-display'
-            style={{color: 
-              props.currentDefinition?.[idx] === word
-                ? 'green'
-                : props.currentDefinition?.some((w: Lowercase<string>) => w === word) 
-                  ? 'darkorange'
-                  : 'red'
-          }}>
+            style={{color: getResultColor(props.guess.value, idx, props.currentDefinition)}}>
             {word}
           </span>
         ))
