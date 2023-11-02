@@ -1,13 +1,14 @@
 @use 'sass:math';
 
-$primary: white;
+$primary: black;
 $secondary: white;
+$accent: darkorange;
 
 // change the theme
 $theme-colors: (
-  "primary": #0074d9,
-  "danger": #ff4136,
-  "warning":darkorange,
+  "primary": $primary,
+  "danger": $secondary,
+  "warning": $accent,
   --bs-modal-color: black
 );
 
@@ -74,13 +75,30 @@ table td {
   border: 1px solid $secondary;
 }
 
+#guess_submit_container{
+  bottom: 0;
+  min-width: 400px;
+  left: calc(50vw - 200px);
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  border: 2px solid $secondary;
+  border-bottom: 0;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
 button {
   border-radius: 5px;
   padding-left: 10px;
   padding-right: 10px;
   padding-top: 5px;
   padding-bottom: 5px;
-  border-color: $primary;
+  border-color: $accent;
 }
 
 input[type=submit]{

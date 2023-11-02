@@ -7,7 +7,6 @@ interface EntryFormProps {
   guesses: Guess[];
   previousGuess?: Guess;
   currentDefinition?: Lowercase<string>[];
-  originalDefinitionString?: string;
   addGuessToState: (guess: string[], similarity: number) => void;
 }
 
@@ -106,7 +105,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
           >
           </div>
         </div>
-        <div className='py-3 fixed-bottom d-flex justify-content-center align-items-center' style={{gap: '50px', backgroundColor: 'black'}}>
+        <div id='guess_submit_container'>
           <input
             id='guess_hint'
             type='button'
@@ -117,6 +116,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
           <input
             id='guess_submit'
             type='submit'
+            value='Guess'
             onClick={() => {
               // get our input object
               let input = (document.getElementById(`guess_input`) as HTMLDivElement)
@@ -149,7 +149,7 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
             type='button'
             value='Reset'
             style={{fontSize:'16px'}}
-            onClick={() => (document.getElementById('guess_form') as HTMLFormElement).reset()}//(document.getElementById('guess_input') as HTMLDivElement)!.innerText = ''}}
+            onClick={() => (document.getElementById('guess_input') as HTMLDivElement)!.innerText = ''}
           />
         </div>
       </form>
