@@ -1,13 +1,13 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.scss';
-import { Badge, Card, CardBody, Col, Container, Row, Spinner } from 'reactstrap'
+import { Col, Container, Row, Spinner } from 'reactstrap';
 import { EntryForm } from './components/EntryForm';
 import { Guess } from './types';
-import { evaluatePhrase } from './API';
+import { evaluatePhrase, getRandomWord, getWordData } from './API';
 import { cleanString } from './utils';
-import wordDictionary from './wordDictionary.json' 
 import { GuessTable } from './components/GuessTable';
+import { WordDisplay } from './components/WordDisplay';
 
 interface Props {
 
@@ -15,19 +15,12 @@ interface Props {
 
 interface State {
   currentWord?: string;
-  currentDefinition?: Lowercase<string>[];
-  originalDefinitionString?: string;
-  originalDefinitionData?: {antonyms: string[], definitions: {definition:string, example:string}[], partOfSpeech: string, synonyms: string[]};
+  currentWordData?: {definition: Lowercase<string>[], partOfSpeech?: string, usageExample?: string, synonyms?: string[], antonyms?: string[]}
   guesses: Guess[];
   previousGuess?: Guess;
   spinner: boolean;
+  showIntroModal: boolean;
 }
-
-
-const wordDefinitionOptions = (word: string) => ({
-  method: 'GET',
-  url: `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`
-});
 
 class App extends React.Component<Props, State> {
 
@@ -36,40 +29,49 @@ class App extends React.Component<Props, State> {
 
     this.state = {
       currentWord: undefined,
-      currentDefinition: [],
-      originalDefinitionString: undefined,
-      originalDefinitionData: undefined,
+      currentWordData: undefined,
       guesses: [],
       previousGuess: undefined,
-      spinner: true
+      spinner: true,
+      showIntroModal: true
     }
   }
 
   componentDidMount(): void {
-    // choose a random word
-    this.chooseNewWord(wordDictionary[Math.floor(Math.random()*wordDictionary.length)])
+    // get our word
+    this.chooseNewWord()
 
     // warm up lambda function
     evaluatePhrase(['x'],['y']).then(res => this.setState({spinner: false}))
   }
 
   componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
-    if(prevState.currentDefinition !== this.state.currentDefinition){
+    if(prevState.currentWordData?.definition !== this.state.currentWordData?.definition){
       console.log('updated')
     }
   }
 
-  chooseNewWord(word: string): void {
-    fetch(wordDefinitionOptions(word).url, wordDefinitionOptions(word))
-      .then(res => res.json())
-      .then(data => this.setState({
-        currentWord: cleanString(word), 
-        currentDefinition: data[0]['meanings'][0]?.['definitions'][0]['definition']
-          .split(' ')
-          .map((w: string) => cleanString(w)),
-        originalDefinitionString: data[0]['meanings'][0]?.['definitions'][0]['definition'],
-        originalDefinitionData: data[0]['meanings'][0]
-      }, () => console.log(this.state.originalDefinitionData)))
+  async chooseNewWord() {
+    let word, definition
+
+    do{
+      word = await getRandomWord()
+      word = word[0]?.toLowerCase()
+      definition = await getWordData(word)
+    } while(!definition.entries[0]?.lexemes?.[0]?.senses[0].usageExamples)
+
+    console.log(definition)
+
+    this.setState({
+      currentWord: cleanString(word), 
+      currentWordData: {
+        definition: definition.entries[0].lexemes[0].senses[0].definition.split(' ').map(w => cleanString(w)),
+        usageExample: definition.entries[0].lexemes[0].senses[0].usageExamples?.[0].replace('  ',' '),
+        partOfSpeech: definition.entries[0].lexemes[0].partOfSpeech,
+        synonyms: definition.entries[0].lexemes[0].senses[0].synonyms,
+        antonyms: definition.entries[0].lexemes[0].senses[0].antonyms
+      }
+    })
   }
 
   addGuessToState(guessArray: string[], similarity: number) {
@@ -88,33 +90,16 @@ class App extends React.Component<Props, State> {
 
   render() {
     return !this.state.spinner ? (
-      <div>
-        <div className='text-center mt-3 mb-2'>
-          <h3>definition</h3>
-        </div>
-        <div className='text-center mb-3'>
-          <p>
-            Define the word below in the space provided
-          </p>
-        </div>
-        <br/><br/><br/><br/><br/>
+      <div style={{marginBottom: '100px'}}>
         {/* <div className='pretty-lines'/> */}
-        <Container className='text-center'>
+        <Container className='mt-5 text-center'>
           <Row>
             <Col className='d-flex justify-content-center'>
-              <Card className='w-50'>
-                <CardBody>
-                  <Badge pill className='mx-3' color='warning'>
-                    {this.state.originalDefinitionData?.partOfSpeech}
-                  </Badge>
-                  <h1 className='mt-2'>
-                    {this.state.currentWord}
-                  </h1>
-                  <div className='mt-2'>
-                    {this.state.originalDefinitionData?.definitions[0].example}
-                  </div>
-                </CardBody>
-              </Card>
+              <WordDisplay
+                word={this.state.currentWord}
+                partOfSpeech={this.state.currentWordData?.partOfSpeech}
+                usageExample={this.state.currentWordData?.usageExample}
+              />
             </Col>
           </Row>
           <Row className='mt-5'>
@@ -122,21 +107,41 @@ class App extends React.Component<Props, State> {
               <EntryForm
                 guesses={this.state.guesses}
                 previousGuess={this.state.previousGuess}
-                currentDefinition={this.state.currentDefinition}
-                originalDefinitionString={this.state.originalDefinitionString}
+                currentDefinition={this.state.currentWordData?.definition}
                 addGuessToState={this.addGuessToState.bind(this)}
               />
             </Col>
           </Row>
           <Row className='mt-5'>
-            <Col className='d-flex justify-content-center'>
+            <Col>
               <GuessTable
                 guesses={this.state.guesses}
-                currentDefinition={this.state.currentDefinition}
+                previousGuess={this.state.previousGuess}
+                currentDefinition={this.state.currentWordData?.definition}
               />
             </Col>
           </Row>
         </Container>
+        {/* <Modal className='my-auto h-100 d-flex align-items-center justify-content-center' isOpen={this.state.showIntroModal}>
+          <ModalBody>
+            <div className='d-flex flex-column align-items-center text-center'>
+              <div className='mt-3 mb-2'>
+                <h3>definition</h3>
+              </div>
+              <div className='mb-3'>
+                <p>
+                  Define the word below in the space provided
+                </p>
+              </div>
+              <form>
+                <input
+                  type='submit'
+                  onClick={() => this.setState({showIntroModal: false})}
+                />
+              </form>
+            </div>
+          </ModalBody>
+        </Modal> */}
       </div>
     ) : <div style={{height:'100vh'}} className='d-flex justify-content-center align-items-center'><Spinner/></div>
   };
