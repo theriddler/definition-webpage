@@ -7,7 +7,8 @@ $secondary: white;
 $theme-colors: (
   "primary": #0074d9,
   "danger": #ff4136,
-  "warning":darkorange
+  "warning":darkorange,
+  --bs-modal-color: black
 );
 
 // Import Bootstrap and its default variables
@@ -47,26 +48,25 @@ table td {
   font-size: 24px;
 }
 
-.textarea-container {
+#guess_input_container {
   border: 0;
   display: table;
   width: 100%;
   min-height: 48px;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow-wrap: break-word;
 }
 
 #guess_input{
   height: 100%;
   width: 100%;
   padding: 10px;
+  margin-right: 10px;
   text-align: center;
-  font-size: 36px;
+  vertical-align: center;
+  color: white;
   border: 1px dashed grey;
   border-radius: 5px;
-  margin-right: 10px;
-  vertical-align: center;
-  scrollbar-width: 0px;
+  font-size: 36px;
   font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
 
@@ -95,27 +95,29 @@ input[type=button]{
 
 .guess-table {
   width: 100%;
-  table-layout: fixed;
-  white-space: wrap;
-  font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
   font-size: 24px;
+  font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New, monospace;
 }
 
-.guess-table tr {
+.guess-row {
+  width: 100%;
   border-bottom: 2px dotted white;
+  display: flex;
+  justify-content: space-between;
 }
 
-.guess-table tr td {
+.guess-row td {
   padding-top: 10px;
   padding-bottom: 10px;
   white-space: wrap;
 }
 
-.guess-table tr td:nth-child(1) {
+.guess-row td:nth-child(1) {
+  width: 90%;
   text-align: left;
 }
 
-.guess-table tr td:nth-child(2) {
+.guess-row td:nth-child(2) {
   text-align: right;
 }
 

@@ -91,14 +91,11 @@ export class EntryForm extends React.Component<EntryFormProps, EntryFormState> {
   render(){
     return (
       <form id='guess_form' onSubmit={(event) => event.preventDefault()}>
-        <div className="textarea-container">
+        <div id="guess_input_container">
           <div
             contentEditable 
             id='guess_input' 
             onKeyDownCapture={(e) => {
-              if (e.key === "Enter" && !e.shiftKey)
-                e.preventDefault()
-
               if(!e.code.includes('Key') && !e.code.includes('Arrow') && e.code !== 'Space' && e.code !== 'Backspace')
                 e.preventDefault()
             }}
