@@ -1,10 +1,6 @@
 const getRandomWordURL = 'https://random-word-form.repl.co/random/noun' //https://random-word-api.p.rapidapi.com/get_word'
 const getRandomWordOptions = {
-  method: 'GET',
-  // headers: {
-  //   'X-RapidAPI-Key': '6ec85af870msh4898dba973f5b70p149201jsnb7914fe73642',
-  //   'X-RapidAPI-Host': 'random-word-api.p.rapidapi.com'
-  // }
+  method: 'GET'
 };
 
 export function getRandomWord(): Promise<string[]>{
@@ -20,7 +16,7 @@ const getWordDataURL = (word: string) => `https://lingua-robot.p.rapidapi.com/la
 const getWordDataOptions = {
   method: 'GET',
   headers: {
-    'X-RapidAPI-Key': '6ec85af870msh4898dba973f5b70p149201jsnb7914fe73642',
+    'X-RapidAPI-Key': process.env.REACT_APP_RAPID_API_KEY || '',
     'X-RapidAPI-Host': 'lingua-robot.p.rapidapi.com'
   }
 };
